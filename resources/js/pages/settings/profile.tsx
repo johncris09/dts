@@ -34,35 +34,52 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } = useForm<Required<ProfileForm>>({
+    const { data, setData, patch, post, errors, processing, recentlySuccessful } = useForm<Required<ProfileForm>>({
         name: auth.user.name,
         email: auth.user.email,
         avatar: null,
     });
 
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
+        const file = e.target.files?.[0]
+        if (!file) return
 
-            setData('avatar', file);
-
-            // Show preview
-            const reader = new FileReader();
-
-            reader.onloadend = () => {
-                setPreview(reader.result as string);
-            };
-            reader.readAsDataURL(file);
+        // Validate file type
+        const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"]
+        if (!validTypes.includes(file.type)) {
+            alert('Please select a JPG, PNG, GIF, or WebP image.')
+            // toast.error('Invalid File Type', {
+            //     description: "Please select a JPG, PNG, GIF, or WebP image.",
+            // });
+            return
         }
-    };
+
+        // Validate file size (5MB limit)
+        const maxSize = 5 * 1024 * 1024 // 5MB in bytes
+        if (file.size > maxSize) {
+            alert('Please select an image smaller than 5MB.')
+
+            return
+        }
+
+        // Create preview
+        const url = URL.createObjectURL(file)
+        setPreview(url)
+        setData("avatar", file)
+    }
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
+        if (data.avatar) {
+            post(route("user.update_avatar", auth.user.id), {
+            })
+        } else {
 
-        patch(route('profile.update'), {
-            preserveScroll: true,
-            forceFormData: true,
-        });
+            patch(route('profile.update'), {
+                preserveScroll: true,
+            });
+        }
+
     };
 
     return (

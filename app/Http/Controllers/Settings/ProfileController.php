@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
+use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -29,31 +30,15 @@ class ProfileController extends Controller
     /**
      * Update the user's profile settings.
      */
-    public function update(ProfileUpdateRequest $request)//: RedirectResponse
+    public function update(ProfileUpdateRequest $request): RedirectResponse
     {
+        $request->user()->fill($request->validated());
 
-        $user = $request->user();
-        $user->fill($request->validated());
-
-        if ($user->isDirty('email')) {
-            $user->email_verified_at = null;
+        if ($request->user()->isDirty('email')) {
+            $request->user()->email_verified_at = null;
         }
 
-        // Handle avatar upload
-        if ($request->hasFile('avatar')) {
-            $avatar = $request->file('avatar');
-            $avatarName = $user->id . '_' . time() . '.' . $avatar->getClientOriginalExtension();
-
-            // Delete old avatar if exists
-            if ($user->avatar) {
-                Storage::disk('public')->delete($user->avatar);
-            }
-
-            $avatar->storeAs('avatars', $avatarName, 'public');
-            $user->avatar = 'avatars/' . $avatarName;
-        }
-
-        $user->save();
+        $request->user()->save();
 
         return to_route('profile.edit');
     }
@@ -77,5 +62,33 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/');
+    }
+
+    public function updateAvatar(Request $request, User $applicant)
+    {
+        $user = $request->user();
+
+        $user->fill($request->validate([
+            'avatar' => ['nullable', 'image', 'max:2048'],
+        ]));
+
+
+        // Handle avatar upload
+        if ($request->hasFile('avatar')) {
+            $avatar = $request->file('avatar');
+            $avatarName = $user->id . '_' . time() . '.' . $avatar->getClientOriginalExtension();
+
+            // Delete old avatar if exists
+            if ($user->avatar) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+
+            $avatar->storeAs('avatars', $avatarName, 'public');
+            $user->avatar = 'avatars/' . $avatarName;
+        }
+
+        $user->save();
+
+        return to_route('profile.edit');
     }
 }
