@@ -32,7 +32,8 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="size-10 rounded-full p-1">
                             <Avatar className="size-8 overflow-hidden rounded-full">
-                                <AvatarImage src={auth.user.avatar} alt={auth.user.name} />
+                                <AvatarImage src={auth.user.avatar ? `/storage/${auth.user.avatar}` : "/placeholder.svg?height=128&width=128"}
+                                    alt={`${auth.user.name}`} />
                                 <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
                                     {getInitials(auth.user.name)}
                                 </AvatarFallback>

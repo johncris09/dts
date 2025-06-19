@@ -21,7 +21,7 @@ class UserResource extends JsonResource
             'roles' => $this->whenLoaded('roles', function () {
                 return $this->roles->pluck('name');
             }),
-            // 'avatar' => $this->avatar ? asset('storage/avatars/' . $this->avatar) : null,
+            'avatar' => $this->avatar ? asset('storage/' . $this->avatar) : null,
             'created_at' => $this->created_at->format('d F Y'),
             'updated_at' => $this->updated_at->format('d F Y'),
             'permissions' => $this->whenLoaded('permissions', function () {
