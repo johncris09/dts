@@ -1,8 +1,10 @@
 import { type BreadcrumbItem, type SharedData } from '@/types';
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 import { Transition } from '@headlessui/react';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
-
+import { FormEventHandler, useRef, useState } from 'react';
 import DeleteUser from '@/components/delete-user';
 import HeadingSmall from '@/components/heading-small';
 import InputError from '@/components/input-error';
@@ -11,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
+import { getInitials } from '@/hooks/helpers';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -22,21 +25,43 @@ const breadcrumbs: BreadcrumbItem[] = [
 type ProfileForm = {
     name: string;
     email: string;
+    avatar: File | null
 };
 
 export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status?: string }) {
     const { auth } = usePage<SharedData>().props;
+    const [preview, setPreview] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
 
     const { data, setData, patch, errors, processing, recentlySuccessful } = useForm<Required<ProfileForm>>({
         name: auth.user.name,
         email: auth.user.email,
+        avatar: null,
     });
+
+    const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+
+            setData('avatar', file);
+
+            // Show preview
+            const reader = new FileReader();
+
+            reader.onloadend = () => {
+                setPreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
 
         patch(route('profile.update'), {
             preserveScroll: true,
+            forceFormData: true,
         });
     };
 
@@ -46,9 +71,42 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
 
             <SettingsLayout>
                 <div className="space-y-6">
-                    <HeadingSmall title="Profile information" description="Update your name and email address" />
+                    <HeadingSmall title="Profile information" description="Update your profile" />
 
-                    <form onSubmit={submit} className="space-y-6">
+                    <form onSubmit={submit} className="space-y-6" encType="multipart/form-data">
+                        <div className="flex gap-4 items-center">
+                            <Button
+                                variant="ghost"
+                                className="p-0 hover:bg-transparent"
+                                type="button"
+                                onClick={() => fileInputRef.current?.click()}
+                            >
+                                <Avatar className="w-14 h-14 cursor-pointer">
+                                    <AvatarImage src={preview || (auth.user.avatar ? `/storage/${auth.user.avatar}` : "/placeholder.svg?height=128&width=128")}
+                                        alt={`${auth.user.name}`} />
+                                    <AvatarFallback className="bg-blue-100 text-blue-600 font-medium">
+                                        {getInitials(auth.user.name)}
+                                    </AvatarFallback>
+                                </Avatar>
+                            </Button>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                ref={fileInputRef}
+                                className="hidden"
+                                onChange={handleAvatarChange}
+                            />
+                            <div className="space-y-1">
+                                <div className="text-sm text-muted-foreground">
+                                    Accepted formats: .jpg, .jpeg, .png
+                                    <br />
+                                    Maximum file size: 2MB
+                                </div>
+                            </div>
+                            <InputError className="mt-2" message={errors.avatar} />
+                        </div>
+
+
                         <div className="grid gap-2">
                             <Label htmlFor="name">Name</Label>
 
