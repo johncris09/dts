@@ -3,7 +3,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { LayoutGrid, UserIcon } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Box, CircleCheckBig, FilesIcon, LayoutGrid, UserIcon } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -11,6 +11,31 @@ const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: '/dashboard',
         icon: LayoutGrid,
+    },
+    {
+        title: 'Documents',
+        href: '/documents',
+        icon: FilesIcon,
+    },
+    {
+        title: 'Received',
+        href: '/received',
+        icon: Box,
+    },
+    {
+        title: 'Outgoing',
+        href: '/outgoing',
+        icon: ArrowRight,
+    },
+    {
+        title: 'Complete',
+        href: '/complete',
+        icon: CircleCheckBig,
+    },
+    {
+        title: 'return',
+        href: '/return',
+        icon: ArrowLeft,
     },
     {
         title: 'Users',
