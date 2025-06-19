@@ -1,4 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "@/components/ui/data-table-column-header";
 import { RowActions } from "@/components/DataTable/RowActions";
@@ -46,18 +47,17 @@ export const columns: ColumnDef<User>[] = [
         ),
         cell: ({ row }) => {
             const user = row.original;
+            console.info(user.avatar)
             return (
                 <div className="flex gap-4 items-center">
                     <div className="flex overflow-hidden justify-center items-center font-semibold rounded-full size-10 bg-muted text-primary/80">
-                        {user.avatar ? (
-                            <img
-                                src={`${user.avatar}`}
-                                alt="User Avatar"
-                                className="object-cover object-center size-full"
-                            />
-                        ) : (
-                            getInitials(user.name)
-                        )}
+                        <Avatar className="w-14 h-14 cursor-pointer">
+                            <AvatarImage src={user.avatar ? `${user.avatar}` : "/placeholder.svg?height=128&width=128"}
+                                alt={`${user.name}`} />
+                            <AvatarFallback className="bg-blue-100 text-blue-600 font-medium">
+                                {getInitials(user.name)}
+                            </AvatarFallback>
+                        </Avatar>
                     </div>
                     <div>
                         <div className="font-medium">
