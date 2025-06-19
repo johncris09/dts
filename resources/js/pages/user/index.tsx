@@ -10,8 +10,8 @@ export default function Users({ users }: PageProps) {
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: 'User',
-            href: '/user',
+            title: 'Users',
+            href: '/users',
         },
     ];
 
@@ -20,9 +20,9 @@ export default function Users({ users }: PageProps) {
             <Head title="Users" />
             <div className="container mx-auto space-y-6 px-5 py-6">
                 <div className="flex items-center justify-between">
-                    <h6 className="text-2x font-bold">User</h6>
+                    <h6 className="text-2x font-bold">Users</h6>
 
-                    <Button  >
+                    <Button size='sm' >
                         <Plus />
                         Add New
                     </Button>

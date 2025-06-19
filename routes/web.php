@@ -11,7 +11,7 @@ Route::redirect('/', 'dashboard')->name('home');
 Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::resource('user', UserController::class);
+    Route::resource('users', UserController::class);
 
 });
 
