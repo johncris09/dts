@@ -33,7 +33,7 @@ const mainNavItems: NavItem[] = [
         icon: CircleCheckBig,
     },
     {
-        title: 'return',
+        title: 'Return',
         href: '/return',
         icon: ArrowLeft,
     },
