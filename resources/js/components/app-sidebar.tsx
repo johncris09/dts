@@ -3,7 +3,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { ArrowLeft, ArrowRight, Box, CircleCheckBig, FilesIcon, LayoutGrid, UserIcon } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Box, CircleCheckBig, FilesIcon, KeyRound, LayoutGrid, ShieldAlert, UserIcon } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -41,6 +41,16 @@ const mainNavItems: NavItem[] = [
         title: 'Users',
         href: '/users',
         icon: UserIcon,
+    },
+    {
+        title: 'Roles',
+        href: '/roles',
+        icon: ShieldAlert,
+    },
+    {
+        title: 'Permissions',
+        href: '/permissions',
+        icon: KeyRound,
     },
 ];
 
