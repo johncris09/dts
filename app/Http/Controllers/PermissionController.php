@@ -45,7 +45,7 @@ class PermissionController extends Controller
     public function store(StorePermissionRequest $request)
     {
 
-        Gate::authorize('create permission');
+        Gate::authorize('create permissions');
 
         Permission::create($request->validated());
 
