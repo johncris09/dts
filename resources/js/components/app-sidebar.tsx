@@ -11,46 +11,55 @@ const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: '/dashboard',
         icon: LayoutGrid,
+        permission: ['view dashboard']
     },
     {
         title: 'Documents',
         href: '/documents',
         icon: FilesIcon,
+        permission: ['view documents']
     },
     {
         title: 'Received',
         href: '/received',
         icon: Box,
+        permission: ['view received']
     },
     {
         title: 'Outgoing',
         href: '/outgoing',
         icon: ArrowRight,
+        permission: ['view outgoing']
     },
     {
         title: 'Complete',
         href: '/complete',
         icon: CircleCheckBig,
+        permission: ['view complete']
     },
     {
         title: 'Return',
         href: '/return',
         icon: ArrowLeft,
+        permission: ['view return']
     },
     {
         title: 'Users',
         href: '/users',
         icon: UserIcon,
+        permission: ['view users']
     },
     {
         title: 'Roles',
         href: '/roles',
         icon: ShieldAlert,
+        permission: ['view roles']
     },
     {
         title: 'Permissions',
         href: '/permissions',
         icon: KeyRound,
+        permission: ['view permissions']
     },
 ];
 
