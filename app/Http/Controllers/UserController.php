@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -31,7 +33,7 @@ class UserController extends Controller
             ->paginate($perPage);
 
         return Inertia::render(
-            'user/index',
+            'users/index',
             [
                 'users' => UserResource::collection($users),
                 'roles' => $roles,
@@ -48,15 +50,28 @@ class UserController extends Controller
      */
     public function create()
     {
-        //
+
+        return Inertia::render(
+            'users/create',
+            [
+                'roles' => Role::pluck('name'),
+            ]
+        );
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreUserRequest $request)
     {
-        //
+
+        $user = User::create($request->validated());
+
+        // assign role
+        $user->assignRole($request->roles);
+
+        return redirect()->route('users.index')
+            ->with('success', 'User created successfully!');
     }
 
     /**
@@ -70,17 +85,32 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(User $user)
     {
-        //
+        $user->load('roles');
+
+        $roles = Role::pluck('name');
+        return Inertia::render(
+            'users/edit',
+            [
+                'roles' => $roles,
+                'user' => $user,
+            ]
+        );
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateUserRequest $request, User $user)
     {
-        //
+        $user->update($request->validated());
+        // Sync the user's roles
+        $user->syncRoles($request->roles);
+
+        // Return a success response with a redirect
+        return redirect()->route('users.index')
+            ->with('success', 'User updated successfully!');
     }
 
     /**
