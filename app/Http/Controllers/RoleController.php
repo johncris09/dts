@@ -80,7 +80,7 @@ class RoleController extends Controller
         Gate::authorize('edit roles');
 
         $permissions = Permission::pluck('name');
-
+        $role->load('permissions');
         return Inertia::render('roles/edit', [
             'permissions' => $permissions,
             'role' => $role,
