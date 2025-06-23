@@ -6,11 +6,12 @@ import { Loader2Icon } from "lucide-react";
 import InputError from "@/components/input-error";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
 
 type RoleForm = {
     name: string;
-    avatar: [];
+    permissions: [];
 };
 
 export default function Users({ permissions }: PageProps) {
@@ -23,16 +24,24 @@ export default function Users({ permissions }: PageProps) {
     ];
 
 
-    const { data, setData, post, errors, processing } = useForm<RoleForm>({
+    const { data, setData, post, errors, processing, reset } = useForm<RoleForm>({
         name: "",
         permissions: [],
     });
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
         post(route(`roles.store`), {
             preserveScroll: true,
+            onSuccess: () => {
+                toast.success('Success', {
+                    description: `Role created successfully`,
+                });
+                reset();
+            },
+            onError: (errors) => {
+                console.error(errors);
+            },
         });
     };
 

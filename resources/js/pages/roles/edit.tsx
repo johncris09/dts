@@ -6,11 +6,12 @@ import { Loader2Icon } from "lucide-react";
 import InputError from "@/components/input-error";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
 
 type RoleForm = {
     name: string;
-    avatar: [];
+    permissions: [];
 };
 
 export default function Users({ role, permissions }: PageProps) {
@@ -22,7 +23,7 @@ export default function Users({ role, permissions }: PageProps) {
         },
     ];
 
-    const { data, setData, patch, errors, processing } = useForm<RoleForm>({
+    const { data, setData, patch, errors, processing, reset } = useForm<RoleForm>({
         name: role?.name || "",
         permissions: role?.permissions
             ? role.permissions.map((p) => p.name)
@@ -34,6 +35,15 @@ export default function Users({ role, permissions }: PageProps) {
 
         patch(route(`roles.update`, role), {
             preserveScroll: true,
+            onSuccess: () => {
+                toast.success('Success', {
+                    description: `Role updated successfully`,
+                });
+                reset();
+            },
+            onError: (errors) => {
+                console.error(errors);
+            },
         });
     };
 
