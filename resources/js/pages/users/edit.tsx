@@ -5,17 +5,27 @@ import AppLayout from "@/layouts/app-layout";
 import { Loader2Icon } from "lucide-react";
 import InputError from "@/components/input-error";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/input"; import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { useEffect, useState } from "react";
 
 
 type RegisterForm = {
     name: string;
     email: string;
+    office_id: number | string,
+    division_id: number | string,
     password: string;
     password_confirmation: string;
 };
 
-export default function Users({ user, roles }: PageProps) {
+export default function Users({ user, roles, offices, divisions }: PageProps) {
+    const [divisionsUnderOffice, setDivisionsUnderOffice] = useState([])
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -26,6 +36,8 @@ export default function Users({ user, roles }: PageProps) {
     const { data, setData, patch, errors, processing } = useForm<Required<RegisterForm>>({
         name: user.name || "",
         email: user.email || "",
+        office_id: user.office_id || "",
+        division_id: user.division_id || "",
         roles: user?.roles
             ? user.roles.map((p) => p.name)
             : [],
@@ -37,6 +49,13 @@ export default function Users({ user, roles }: PageProps) {
             preserveScroll: true,
         });
     };
+
+    useEffect(() => {
+
+        setDivisionsUnderOffice(divisions.filter(
+            (division) => division.office_id == data.office_id
+        ));
+    }, [])
 
     const handleRoleChange = (roleName, checked) => {
         if (checked) {
@@ -86,6 +105,62 @@ export default function Users({ user, roles }: PageProps) {
                                 placeholder="email@example.com"
                             />
                             <InputError message={errors.email} />
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="office">Office</Label>
+                            <Select
+                                value={String(data.office_id)} // Ensure it’s string
+                                onValueChange={(value) => {
+                                    setData('office_id', value)
+                                    setDivisionsUnderOffice(divisions.filter(
+                                        (division) => division.office_id == value
+                                    ));
+
+                                    setData('division_id', '')
+                                }}
+                            >
+                                <SelectTrigger className="h-8 w-full">
+                                    <SelectValue placeholder="Select office" />
+                                </SelectTrigger>
+                                <SelectContent side="bottom">
+                                    <SelectItem>
+                                        Select
+                                    </SelectItem>
+                                    {offices.map((office, index) => {
+
+
+                                        return (
+                                            <SelectItem key={index} value={String(office.id)}>
+                                                {office.name} - {office.description}
+                                            </SelectItem>
+                                        )
+                                    })}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="division">Division</Label>
+                            <Select
+                                value={String(data.division_id)} // Ensure it’s string
+                                onValueChange={(value) => setData('division_id', value)} // Keep as string
+                            >
+                                <SelectTrigger className="h-8 w-full">
+                                    <SelectValue placeholder="Select division" />
+                                </SelectTrigger>
+                                <SelectContent side="bottom">
+
+                                    <SelectItem>
+                                        Select
+                                    </SelectItem>
+                                    {divisionsUnderOffice.map((division, index) => {
+                                        return (
+                                            <SelectItem key={index} value={String(division.id)}>
+                                                {division.name} - {division.description}
+                                            </SelectItem>
+                                        )
+                                    })}
+                                </SelectContent>
+                            </Select>
                         </div>
                         <div className="grid">
                             <Label htmlFor="role">Roles</Label>

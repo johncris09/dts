@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserResource;
+use App\Models\Division;
+use App\Models\Office;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -23,7 +25,7 @@ class UserController extends Controller
 
         $roles = Role::all(); //->pluck(value: 'name');
 
-        $users = User::with(['roles'])
+        $users = User::with('roles', 'office.division')
             ->when($search, function ($query, $search) {
                 $query->where(function ($query) use ($search) {
                     $query->where('name', 'like', "%{$search}%")
@@ -31,7 +33,7 @@ class UserController extends Controller
                 });
             })
             ->paginate($perPage);
-
+        // return response()->json($users);
         return Inertia::render(
             'users/index',
             [
@@ -50,11 +52,15 @@ class UserController extends Controller
      */
     public function create()
     {
+        $offices = Office::with(['division'])->orderBy('name')->get();
+        $divisions = Division::with(['office'])->orderBy('name')->get();
 
         return Inertia::render(
             'users/create',
             [
                 'roles' => Role::pluck('name'),
+                'offices' => $offices,
+                'divisions' => $divisions,
             ]
         );
     }
@@ -89,12 +95,17 @@ class UserController extends Controller
     {
         $user->load('roles');
 
+        $offices = Office::with(['division'])->orderBy('name')->get();
+        $divisions = Division::with(['office'])->orderBy('name')->get();
+
         $roles = Role::pluck('name');
         return Inertia::render(
             'users/edit',
             [
                 'roles' => $roles,
                 'user' => $user,
+                'offices' => $offices,
+                'divisions' => $divisions,
             ]
         );
     }

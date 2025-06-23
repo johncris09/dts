@@ -120,13 +120,41 @@ export const columns: ColumnDef<User>[] = [
         },
     },
     {
+        accessorKey: "office",
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Office" />
+        ),
+        cell: ({ row }) => {
+
+            return (
+                <div>
+                    {row.original.office?.name}
+                </div>
+            );
+        },
+    },
+    {
+        accessorKey: "division",
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Division" />
+        ),
+        cell: ({ row }) => {
+
+            return (
+                <div>
+                    {row.original.division?.name}
+                </div>
+            );
+        },
+    },
+    {
         accessorKey: "created_at",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Created At" />
         ),
         cell: ({ row }) => {
             return (
-                <div className="text-right">
+                <div>
                     {new Date(row.original.created_at).toLocaleDateString()}
                 </div>
             );
@@ -139,7 +167,7 @@ export const columns: ColumnDef<User>[] = [
         ),
         cell: ({ row }) => {
             return (
-                <div className="text-right">
+                <div>
                     {new Date(row.original.updated_at).toLocaleDateString()}
                 </div>
             );

@@ -11,4 +11,14 @@ class Office extends Model
     use HasFactory;
 
     protected $fillable = ['name', 'description'];
+
+    public function division()
+    {
+        return $this->hasMany(Division::class);
+    }
+
+    public function office()
+    {
+        return $this->hasMany(Office::class);
+    }
 }
