@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserResource;
@@ -20,6 +21,8 @@ class UserController extends Controller
     public function index(Request $request)
     {
 
+
+        Gate::authorize('view users');
         $search = $request->input('search');
         $perPage = $request->input('per_page', 10); // Default to 10 if not specified
 
@@ -52,6 +55,8 @@ class UserController extends Controller
      */
     public function create()
     {
+
+        Gate::authorize('create users');
         $offices = Office::with(['division'])->orderBy('name')->get();
         $divisions = Division::with(['office'])->orderBy('name')->get();
 
@@ -71,6 +76,8 @@ class UserController extends Controller
     public function store(StoreUserRequest $request)
     {
 
+
+        Gate::authorize('create users');
         $user = User::create($request->validated());
 
         // assign role
@@ -93,6 +100,8 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
+
+        Gate::authorize('edit users');
         $user->load('roles');
 
         $offices = Office::with(['division'])->orderBy('name')->get();
@@ -115,6 +124,8 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user)
     {
+
+        Gate::authorize('edit users');
         $user->update($request->validated());
         // Sync the user's roles
         $user->syncRoles($request->roles);
@@ -129,6 +140,8 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
+
+        Gate::authorize('delete users');
         //
     }
 }
