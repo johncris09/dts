@@ -3,7 +3,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { ArrowLeft, ArrowRight, Box, Building, CircleCheckBig, FilesIcon, KeyRound, LayoutGrid, ShieldAlert, UserIcon } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Box, Building, CircleCheckBig, FilesIcon, GroupIcon, KeyRound, LayoutGrid, Network, ShieldAlert, UserIcon } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -24,6 +24,12 @@ const mainNavItems: NavItem[] = [
         href: '/offices',
         icon: Building,
         permission: ['view offices']
+    },
+    {
+        title: 'Divisions',
+        href: '/divisions',
+        icon: Network,
+        permission: ['view divisions']
     },
     {
         title: 'Received',

@@ -24,7 +24,6 @@ type DivisionForm = {
 };
 
 export default function Divisions({ offices }: PageProps) {
-    console.info(offices)
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Divisions / Create',
