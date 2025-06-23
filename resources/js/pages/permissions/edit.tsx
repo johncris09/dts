@@ -6,6 +6,7 @@ import { Loader2Icon } from "lucide-react";
 import InputError from "@/components/input-error";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
 
 type RoleForm = {
@@ -21,7 +22,7 @@ export default function Users({ permission }: PageProps) {
         },
     ];
 
-    const { data, setData, patch, errors, processing } = useForm<RoleForm>({
+    const { data, setData, patch, errors, processing, reset } = useForm<RoleForm>({
         name: permission?.name || "",
     });
 
@@ -30,6 +31,15 @@ export default function Users({ permission }: PageProps) {
 
         patch(route(`permissions.update`, permission), {
             preserveScroll: true,
+            onSuccess: () => {
+                toast.success('Success', {
+                    description: `Permission updated successfully`,
+                });
+                reset();
+            },
+            onError: (errors) => {
+                console.error(errors);
+            },
         });
     };
     return (

@@ -7,6 +7,7 @@ import InputError from "@/components/input-error";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { FormEventHandler } from "react";
+import { toast } from "sonner";
 
 
 type OfficeForm = {
@@ -24,7 +25,7 @@ export default function Offices() {
     ];
 
 
-    const { data, setData, post, errors, processing } = useForm<Required<OfficeForm>>({
+    const { data, setData, post, errors, processing, reset } = useForm<Required<OfficeForm>>({
         name: "",
         description: '',
     });
@@ -32,6 +33,15 @@ export default function Offices() {
         e.preventDefault();
         post(route('offices.store'), {
             preserveScroll: true,
+            onSuccess: () => {
+                toast.success('Success', {
+                    description: `Office created successfully`,
+                });
+                reset();
+            },
+            onError: (errors) => {
+                console.error(errors);
+            },
         });
     };
     return (

@@ -6,6 +6,7 @@ import { Loader2Icon } from "lucide-react";
 import InputError from "@/components/input-error";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
 
 type OfficeForm = {
@@ -21,7 +22,7 @@ export default function Offices({ office }: PageProps) {
             href: '/offices/edit',
         },
     ];
-    const { data, setData, patch, errors, processing } = useForm<Required<OfficeForm>>({
+    const { data, setData, patch, errors, processing, reset } = useForm<Required<OfficeForm>>({
         name: office.name || "",
         description: office.description || "",
     });
@@ -30,6 +31,15 @@ export default function Offices({ office }: PageProps) {
 
         patch(route(`offices.update`, office), {
             preserveScroll: true,
+            onSuccess: () => {
+                toast.success('Success', {
+                    description: `Office updated successfully`,
+                });
+                reset();
+            },
+            onError: (errors) => {
+                console.error(errors);
+            },
         });
     };
     return (
