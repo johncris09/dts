@@ -112,8 +112,8 @@ export default function Users({ user, roles }: PageProps) {
 
                     <Button type="submit" disabled={processing}>
                         {processing ? <>
-                            <Loader2Icon className="mr-2 h-4 w-4 animate-spin" /> Saving...
-                        </> : 'Save'}
+                            <Loader2Icon className="mr-2 h-4 w-4 animate-spin" /> Updating...
+                        </> : 'Update'}
                     </Button>
                 </form>
             </div>
