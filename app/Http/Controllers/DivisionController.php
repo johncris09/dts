@@ -21,10 +21,29 @@ class DivisionController extends Controller
 
         Gate::authorize('view divisions');
 
+        $authUser = auth()->user();
+
         $search = $request->input('search');
         $perPage = $request->input('per_page', 10); // Default to 10 if not specified
 
         $divisions = Division::with(['office'])->orderBy('name')->paginate(10);
+
+
+        if ($authUser->hasRole('Super Admin')) {
+
+
+            $divisions = Division::with(['office'])
+                ->orderBy('name')
+                ->paginate(10);
+
+        } else if ($authUser->hasRole('Administrator')) {
+
+            $divisions = Division::with(['office'])
+                ->where('office_id', $authUser->office_id)
+                ->orderBy('name')
+                ->paginate(10);
+
+        }
         return Inertia::render(
             'divisions/index',
             [
@@ -83,7 +102,25 @@ class DivisionController extends Controller
     {
 
         Gate::authorize('edit divisions');
-        $division->load(['office']);
+
+        $authUser = auth()->user();
+        // return response()->json($authUser);
+
+
+        if ($authUser->hasRole('Super Admin')) {
+            $division->load(['office']);
+        } else if ($authUser->hasRole('Administrator')) {
+            // Administrator can edit users under the same office (optional: same division)
+            if ($authUser->office_id !== $division->office_id) {
+                abort(403, 'Unauthorized to edit this user.');
+            }
+
+            $division->load(['office'])
+                ->where('office_id', $authUser->office_id)
+                ->get();
+        }
+
+
         return Inertia::render(
             'divisions/edit',
             [
