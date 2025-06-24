@@ -12,7 +12,7 @@ class AddRoleToUserSeeder extends Seeder
      */
     public function run(): void
     {
-        $user = User::find(2);
+        $user = User::find(1);
 
         $user->assignRole('Super Admin');
 
