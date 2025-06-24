@@ -8,13 +8,14 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-    Shield,
     Eye,
     EyeOff
 } from "lucide-react";
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import logo from './../../../image/logo.png';
 import { BackgroundIcons } from '@/components/background-icon';
+import SecureNotice from '@/components/secure-notice';
+import AllRightsReserved from '@/components/all-rights-reserved';
 
 
 
@@ -85,7 +86,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                     style={{ animationDelay: "0.6s" }}
                 >
                     <CardHeader className="space-y-1 pb-6">
-                        <CardTitle className="text-2xl font-semibold text-center">Welcome Back</CardTitle>
+                        <CardTitle className="text-2xl font-semibold text-center">Login</CardTitle>
                         <CardDescription className="text-center">Sign in to access your document dashboard</CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -193,24 +194,9 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                     </CardContent>
                 </Card>
 
-                {/* Security Notice with Animation */}
-                <div
-                    className="mt-6 bg-white/80 backdrop-blur-sm border border-slate-200 rounded-lg p-4 animate-fade-in-up"
-                    style={{ animationDelay: "1.8s" }}
-                >
-                    <div className="flex items-start space-x-3">
-                        <Shield className="h-5 w-5 text-slate-500 mt-0.5 flex-shrink-0 animate-pulse-gentle" />
-                        <div className="text-sm text-slate-600">
-                            <p className="font-medium mb-1">Security Notice</p>
-                            <p>Your session is encrypted and secure. All document access is logged and monitored for compliance.</p>
-                        </div>
-                    </div>
-                </div>
+                <SecureNotice />
+                <AllRightsReserved />
 
-                {/* Footer with Animation */}
-                <div className="text-center mt-8 text-sm text-slate-500 animate-fade-in" style={{ animationDelay: "2s" }}>
-                    <p>&copy; 2024 Document Tracking System. All rights reserved.</p>
-                </div>
             </div>
         </div>
     );
