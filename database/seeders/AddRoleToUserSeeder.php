@@ -14,13 +14,9 @@ class AddRoleToUserSeeder extends Seeder
      */
     public function run(): void
     {
-        $user = User::find(1); // change number 1 to ID of account you want to give permissions
-        $role = Role::where('name', 'Super Admin')->first();
-        $user->assignRole($role);
-        $role->syncPermissions(Permission::all());
+        $user = User::find(1);
 
-        $user->getAllPermissions()->pluck('name');
+        $user->assignRole('Super Admin');
 
-        //should output Illuminate\Support\Collection {#... all: ["view divisions", "create divisions", "edit divisions", ...] }
     }
 }

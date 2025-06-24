@@ -29,7 +29,7 @@ class OfficePolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('view offices');
+        return $user->hasPermissionTo('create offices');
     }
 
     /**
@@ -37,7 +37,7 @@ class OfficePolicy
      */
     public function update(User $user, Office $office): bool
     {
-        return $user->hasPermissionTo('view offices');
+        return $user->hasPermissionTo('edit offices');
     }
 
     /**
@@ -45,22 +45,6 @@ class OfficePolicy
      */
     public function delete(User $user, Office $office): bool
     {
-        return $user->hasPermissionTo('view offices');
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, Office $office): bool
-    {
-        return $user->hasPermissionTo('view offices');
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Office $office): bool
-    {
-        return $user->hasPermissionTo('view offices');
+        return $user->hasPermissionTo('delete offices');
     }
 }

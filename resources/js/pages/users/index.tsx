@@ -8,7 +8,6 @@ import { DataTable } from "@/components/ui/data-table";
 import { can } from "@/lib/can";
 
 export default function Users({ users }: PageProps) {
-
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Users',

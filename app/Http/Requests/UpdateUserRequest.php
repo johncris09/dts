@@ -33,7 +33,9 @@ class UpdateUserRequest extends FormRequest
                 'max:255',
                 // Rule::unique('users')->ignore($this->id),
             ],
-            'roles' => ['required']
+            'roles' => ['required'],
+            'office_id' => ['nullable'],
+            'division_id' => ['nullable'],
         ];
     }
 }
