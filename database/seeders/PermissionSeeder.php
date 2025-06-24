@@ -13,22 +13,27 @@ class PermissionSeeder extends Seeder
     public function run(): void
     {
         $permissions = [
-            'create permissions',
-            'view permissions',
-            'edit permissions',
-            'delete permissions',
-            'create roles',
-            'view roles',
-            'edit roles',
-            'delete roles',
-            'create users',
             'view users',
+            'create users',
             'edit users',
             'delete users',
+            'view divisions',
+            'create divisions',
+            'edit divisions',
+            'delete divisions',
+            'view offices',
+            'view permissions',
+            'create permissions',
+            'edit permissions',
+            'delete permissions',
+            'view roles',
+            'create roles',
+            'edit roles',
+            'delete roles',
         ];
 
         foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission, 'guard_name' => 'web']);
+            Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']); // changed to firstOrCreate
         }
     }
 }
