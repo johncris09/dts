@@ -1,5 +1,5 @@
-import { Head, useForm } from "@inertiajs/react";
-import { BreadcrumbItem, PageProps } from "@/types";
+import { Head, useForm, usePage } from "@inertiajs/react";
+import { BreadcrumbItem, PageProps, SharedData } from "@/types";
 import { Button } from "@/components/ui/button";
 import AppLayout from "@/layouts/app-layout";
 import { Loader2Icon } from "lucide-react";
@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input"; import {
     SelectValue,
 } from "@/components/ui/select";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 
 type RegisterForm = {
@@ -25,6 +26,7 @@ type RegisterForm = {
 };
 
 export default function Users({ user, roles, offices, divisions }: PageProps) {
+    const { auth } = usePage<SharedData>().props
     const [divisionsUnderOffice, setDivisionsUnderOffice] = useState([])
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -33,7 +35,7 @@ export default function Users({ user, roles, offices, divisions }: PageProps) {
             href: '/users/edit',
         },
     ];
-    const { data, setData, patch, errors, processing } = useForm<Required<RegisterForm>>({
+    const { data, setData, patch, errors, processing, reset } = useForm<Required<RegisterForm>>({
         name: user.name || "",
         email: user.email || "",
         office_id: user.office_id || "",
@@ -44,9 +46,17 @@ export default function Users({ user, roles, offices, divisions }: PageProps) {
     });
     const handleSubmit = (e) => {
         e.preventDefault();
-
         patch(route(`users.update`, user), {
             preserveScroll: true,
+            onSuccess: () => {
+                toast.success('Success', {
+                    description: `User created successfully`,
+                });
+                reset();
+            },
+            onError: (errors) => {
+                console.error(errors);
+            },
         });
     };
 
@@ -106,7 +116,7 @@ export default function Users({ user, roles, offices, divisions }: PageProps) {
                             />
                             <InputError message={errors.email} />
                         </div>
-                        <div className="grid gap-2">
+                        {auth?.roles?.includes('Super Admin') && <div className="grid gap-2">
                             <Label htmlFor="office">Office</Label>
                             <Select
                                 value={String(data.office_id)} // Ensure it’s string
@@ -137,7 +147,8 @@ export default function Users({ user, roles, offices, divisions }: PageProps) {
                                     })}
                                 </SelectContent>
                             </Select>
-                        </div>
+                        </div>}
+
                         <div className="grid gap-2">
                             <Label htmlFor="division">Division</Label>
                             <Select

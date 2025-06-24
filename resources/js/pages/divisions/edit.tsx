@@ -1,4 +1,4 @@
-import { Head, useForm } from "@inertiajs/react";
+import { Head, useForm, usePage } from "@inertiajs/react";
 import {
     Select,
     SelectContent,
@@ -6,7 +6,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { BreadcrumbItem, PageProps } from "@/types";
+import { BreadcrumbItem, PageProps, SharedData } from "@/types";
 import { Button } from "@/components/ui/button";
 import AppLayout from "@/layouts/app-layout";
 import { Loader2Icon } from "lucide-react";
@@ -24,7 +24,7 @@ type DivisionForm = {
 };
 
 export default function Divisions({ division, offices }: PageProps) {
-
+    const { auth } = usePage<SharedData>().props
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Divisions / Edit',
@@ -33,18 +33,18 @@ export default function Divisions({ division, offices }: PageProps) {
     ];
 
 
-    const { data, setData, post, errors, processing, reset } = useForm<Required<DivisionForm>>({
+    const { data, setData, patch, errors, processing, reset } = useForm<Required<DivisionForm>>({
         name: division.name || "",
         description: division.description || "",
         office_id: division.office_id || "",
     });
     const handleSubmit: FormEventHandler = (e) => {
         e.preventDefault();
-        post(route('divisions.store'), {
+        patch(route(`divisions.update`, division), {
             preserveScroll: true,
             onSuccess: () => {
                 toast.success('Success', {
-                    description: `Division created successfully`,
+                    description: 'Division updated successfully',
                 });
                 reset();
             },
@@ -52,6 +52,7 @@ export default function Divisions({ division, offices }: PageProps) {
                 console.error(errors);
             },
         });
+
     };
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -93,7 +94,7 @@ export default function Divisions({ division, offices }: PageProps) {
                             />
                             <InputError message={errors.description} />
                         </div>
-                        <div className="grid gap-2">
+                        {auth?.roles?.includes('Super Admin') && <div className="grid gap-2">
                             <Label htmlFor="office">Office</Label>
                             <Select
                                 value={String(data.office_id)} // Ensure it’s string
@@ -113,10 +114,7 @@ export default function Divisions({ division, offices }: PageProps) {
                                 </SelectContent>
                             </Select>
                             <InputError message={errors.office_id} />
-                        </div>
-
-
-
+                        </div>}
 
                     </div>
 

@@ -23,20 +23,38 @@ class UserController extends Controller
 
 
         Gate::authorize('view users');
+
+
+        $authUser = auth()->user();
+
+
         $search = $request->input('search');
         $perPage = $request->input('per_page', 10); // Default to 10 if not specified
+        $roles = Role::all();
 
-        $roles = Role::all(); //->pluck(value: 'name');
 
-        $users = User::with('roles', 'office.division')
-            ->when($search, function ($query, $search) {
-                $query->where(function ($query) use ($search) {
-                    $query->where('name', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%");
-                });
-            })
-            ->paginate($perPage);
-        // return response()->json($users);
+        if ($authUser->hasRole('Super Admin')) {
+
+            $users = User::with('roles', 'office.division')
+                ->when($search, function ($query, $search) {
+                    $query->where(function ($query) use ($search) {
+                        $query->where('name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
+                    });
+                })
+                ->paginate($perPage);
+        } else if ($authUser->hasRole('Administrator')) {
+            // Show users in the same office (and optionally same division)
+            $users = User::with('roles', 'office.division')
+                ->where('office_id', $authUser->office_id)
+                ->when($search, function ($query, $search) {
+                    $query->where(function ($query) use ($search) {
+                        $query->where('name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
+                    });
+                })
+                ->paginate($perPage);
+        }
         return Inertia::render(
             'users/index',
             [
@@ -57,13 +75,22 @@ class UserController extends Controller
     {
 
         Gate::authorize('create users');
+
+        $authUser = auth()->user();
+
+        if ($authUser->hasRole('Super Admin')) {
+            $roles = Role::pluck('name');
+        } else if ($authUser->hasRole('Administrator')) {
+            $roles = Role::where('name', '!=', 'Super Admin')->pluck('name');
+        }
+
         $offices = Office::with(['division'])->orderBy('name')->get();
         $divisions = Division::with(['office'])->orderBy('name')->get();
 
         return Inertia::render(
             'users/create',
             [
-                'roles' => Role::pluck('name'),
+                'roles' => $roles,
                 'offices' => $offices,
                 'divisions' => $divisions,
             ]
@@ -102,12 +129,24 @@ class UserController extends Controller
     {
 
         Gate::authorize('edit users');
-        $user->load('roles');
 
+
+        $authUser = auth()->user();
+
+        $user->load('roles');
         $offices = Office::with(['division'])->orderBy('name')->get();
         $divisions = Division::with(['office'])->orderBy('name')->get();
 
-        $roles = Role::pluck('name');
+
+        if ($authUser->hasRole('Super Admin')) {
+            $roles = Role::pluck('name');
+        } else if ($authUser->hasRole('Administrator')) {
+            // Administrator can edit users under the same office (optional: same division)
+            if ($authUser->office_id !== $user->office_id) {
+                abort(403, 'Unauthorized to edit this user.');
+            }
+            $roles = Role::where('name', '!=', 'Super Admin')->pluck('name');
+        }
         return Inertia::render(
             'users/edit',
             [

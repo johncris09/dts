@@ -1,12 +1,12 @@
-import { Head, useForm } from "@inertiajs/react";
-import { BreadcrumbItem, PageProps } from "@/types";
+import { Head, useForm, usePage } from "@inertiajs/react";
+import { BreadcrumbItem, PageProps, SharedData } from "@/types";
 import { Button } from "@/components/ui/button";
 import AppLayout from "@/layouts/app-layout";
 import { Loader2Icon } from "lucide-react";
 import InputError from "@/components/input-error";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { FormEventHandler, useState } from "react";
+import { FormEventHandler, useEffect, useState } from "react";
 import {
     Select,
     SelectContent,
@@ -26,6 +26,8 @@ type RegisterForm = {
 };
 
 export default function Users({ roles, offices, divisions }: PageProps) {
+    const { auth } = usePage<SharedData>().props
+
     const [divisionsUnderOffice, setDivisionsUnderOffice] = useState([])
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -38,7 +40,7 @@ export default function Users({ roles, offices, divisions }: PageProps) {
     const { data, setData, post, errors, processing, reset } = useForm<Required<RegisterForm>>({
         name: "",
         email: '',
-        office_id: '',
+        office_id: auth?.roles?.includes('Administrator') ? auth?.user?.office_id : '',
         division_id: '',
         password: '',
         password_confirmation: '',
@@ -67,6 +69,14 @@ export default function Users({ roles, offices, divisions }: PageProps) {
             setData("roles", data.roles.filter(name => name !== roleName))
         }
     }
+
+    useEffect(() => {
+        if (auth?.roles?.includes('Administrator')) {
+            setDivisionsUnderOffice(divisions.filter(
+                (division) => division.office_id == auth?.user?.office_id
+            ));
+        }
+    }, [])
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create User" />
@@ -108,7 +118,7 @@ export default function Users({ roles, offices, divisions }: PageProps) {
                             />
                             <InputError message={errors.email} />
                         </div>
-                        <div className="grid gap-2">
+                        {auth?.roles?.includes('Super Admin') && <div className="grid gap-2">
                             <Label htmlFor="office">Office</Label>
                             <Select
                                 value={String(data.office_id)} // Ensure it’s string
@@ -122,7 +132,7 @@ export default function Users({ roles, offices, divisions }: PageProps) {
                                 }}
                             >
                                 <SelectTrigger className="h-8 w-full">
-                                    <SelectValue placeholder="Select office" />
+                                    <SelectValue placeholder="Select Office" />
                                 </SelectTrigger>
                                 <SelectContent side="bottom">
                                     <SelectItem>
@@ -139,7 +149,8 @@ export default function Users({ roles, offices, divisions }: PageProps) {
                                     })}
                                 </SelectContent>
                             </Select>
-                        </div>
+                        </div>}
+
                         <div className="grid gap-2">
                             <Label htmlFor="division">Division</Label>
                             <Select

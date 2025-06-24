@@ -1,4 +1,4 @@
-import { Head, useForm } from "@inertiajs/react";
+import { Head, useForm, usePage } from "@inertiajs/react";
 import {
     Select,
     SelectContent,
@@ -6,14 +6,14 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { BreadcrumbItem, PageProps } from "@/types";
+import { BreadcrumbItem, PageProps, SharedData } from "@/types";
 import { Button } from "@/components/ui/button";
 import AppLayout from "@/layouts/app-layout";
 import { Loader2Icon } from "lucide-react";
 import InputError from "@/components/input-error";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { FormEventHandler } from "react";
+import { FormEventHandler, useEffect } from "react";
 import { toast } from "sonner";
 
 
@@ -23,7 +23,9 @@ type DivisionForm = {
     office_: number;
 };
 
+
 export default function Divisions({ offices }: PageProps) {
+    const { auth } = usePage<SharedData>().props
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Divisions / Create',
@@ -35,7 +37,8 @@ export default function Divisions({ offices }: PageProps) {
     const { data, setData, post, errors, processing, reset } = useForm<Required<DivisionForm>>({
         name: "",
         description: '',
-        office_id: ''
+        office_id: auth?.roles?.includes('Administrator') ? auth?.user?.office_id : '',
+
     });
     const handleSubmit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -53,18 +56,7 @@ export default function Divisions({ offices }: PageProps) {
         });
     };
 
-    const handlePerPageChange = (value: string) => {
-        console.info(value)
-        // router.get(
-        //     meta.path,
-        //     { per_page: value, page: 1 }, // Reset to first page when changing per_page
-        //     {
-        //         preserveState: true,
-        //         preserveScroll: true,
-        //         replace: true,
-        //     }
-        // );
-    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Division" />
@@ -105,7 +97,7 @@ export default function Divisions({ offices }: PageProps) {
                             />
                             <InputError message={errors.description} />
                         </div>
-                        <div className="grid gap-2">
+                        {auth?.roles?.includes('Super Admin') && <div className="grid gap-2">
                             <Label htmlFor="office">Office</Label>
                             <Select
                                 value={String(data.office_id)} // Ensure it’s string
@@ -125,10 +117,7 @@ export default function Divisions({ offices }: PageProps) {
                                 </SelectContent>
                             </Select>
                             <InputError message={errors.office_id} />
-                        </div>
-
-
-
+                        </div>}
 
                     </div>
 
