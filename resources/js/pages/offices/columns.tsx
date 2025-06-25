@@ -62,12 +62,26 @@ export const getColumns = () => {
             header: ({ column }) => (
                 <DataTableColumnHeader column={column} title="Name" />
             ),
+            cell: ({ row }) => (
+                <div className='break-words whitespace-normal capitalize'>
+                    {row.getValue('name')}
+                </div>
+            ),
+            enableSorting: true,
+            enableHiding: true,
         },
         {
             accessorKey: "description",
             header: ({ column }) => (
                 <DataTableColumnHeader column={column} title="Description" />
             ),
+            cell: ({ row }) => (
+                <div className='break-words whitespace-normal capitalize'>
+                    {row.getValue('description')}
+                </div>
+            ),
+            enableSorting: true,
+            enableHiding: true,
         },
     ];
 
