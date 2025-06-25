@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     Dialog,
     DialogContent,
@@ -35,8 +35,12 @@ interface RowActionsProps {
 }
 
 export function RowActions({ item, actions }: RowActionsProps) {
+    const [open, setOpen] = useState(false);
+
+    const requiresConfirmationAction = actions.find((a) => a.requiresConfirmation);
+
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button aria-haspopup="true" size="icon" variant="ghost">
@@ -53,7 +57,10 @@ export function RowActions({ item, actions }: RowActionsProps) {
                                     {action.label}
                                 </Link>
                             ) : action.requiresConfirmation ? (
-                                <DialogTrigger className="block w-full text-left">
+                                <DialogTrigger
+                                    className="block w-full text-left"
+                                    onClick={() => setOpen(true)}
+                                >
                                     {action.label}
                                 </DialogTrigger>
                             ) : (
@@ -69,21 +76,25 @@ export function RowActions({ item, actions }: RowActionsProps) {
                 </DropdownMenuContent>
             </DropdownMenu>
 
-            {actions.find((a) => a.requiresConfirmation) && (
+            {requiresConfirmationAction && (
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Are you sure?</DialogTitle>
                         <DialogDescription>
-                            {actions.find((a) => a.requiresConfirmation)?.confirmationMessage}
+                            {requiresConfirmationAction.confirmationMessage}
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
-                        <DialogClose>
+                        <DialogClose asChild>
                             <Button variant="secondary">Cancel</Button>
                         </DialogClose>
                         <Button
-                            onClick={actions.find((a) => a.requiresConfirmation)?.onClick}
+                            onClick={() => {
+                                requiresConfirmationAction.onClick?.();
+                                setOpen(false); // Close the dialog immediately or after success
+                            }}
                             variant="destructive"
+                            className="text-white hover:cursor-pointer"
                         >
                             Confirm
                         </Button>
