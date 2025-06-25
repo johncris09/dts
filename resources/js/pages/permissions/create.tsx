@@ -7,6 +7,7 @@ import InputError from "@/components/input-error";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { FormEventHandler } from "react";
 
 
 type RoleForm = {
@@ -27,7 +28,7 @@ export default function Users() {
         name: "",
     });
 
-    const handleSubmit = (e) => {
+    const handleSubmit: FormEventHandler = (e) => {
         e.preventDefault();
 
         post(route(`permissions.store`), {
