@@ -1,83 +1,85 @@
-import { Head, useForm } from "@inertiajs/react";
-import { BreadcrumbItem, PageProps } from "@/types";
-import { Button } from "@/components/ui/button";
-import AppLayout from "@/layouts/app-layout";
-import { Loader2Icon } from "lucide-react";
-import InputError from "@/components/input-error";
-import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useEffect } from "react";
+import { useForm } from "@inertiajs/react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import InputError from "@/components/input-error";
+import { Loader2Icon } from "lucide-react";
 import { toast } from "sonner";
-import { FormEventHandler } from "react";
 
-
-type RoleForm = {
+type Props = {
+  isOpen: boolean;
+  onClose: () => void;
+  permission: {
+    id: number;
     name: string;
+  } | null;
 };
 
-export default function Users({ permission }: PageProps) {
+export default function EditPermissionModal({ isOpen, onClose, permission }: Props) {
+  const { data, setData, patch, processing, errors, reset } = useForm({
+    name: "",
+  });
 
-    const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Permissions / Edit',
-            href: '/permissions/create',
-        },
-    ];
+  useEffect(() => {
+    if (permission) {
+      setData({ name: permission.name || "" });
+    } else {
+      reset();
+    }
+  }, [permission]);
 
-    const { data, setData, patch, errors, processing, reset } = useForm<RoleForm>({
-        name: permission?.name || "",
-    });
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!permission) return;
 
-    const handleSubmit: FormEventHandler = (e) => {
-        e.preventDefault();
-
-        patch(route(`permissions.update`, permission), {
-            preserveScroll: true,
-            onSuccess: () => {
-                toast.success('Success', {
-                    description: `Permission updated successfully`,
-                });
-                reset();
-            },
-            onError: (errors) => {
-                console.error(errors);
-            },
+    patch(route("permissions.update", permission.id), {
+      preserveScroll: true,
+      onSuccess: () => {
+        toast.success("Success", {
+          description: "Permission updated successfully.",
         });
-    };
-    return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Edit Permissions" />
-            <div className="container mx-auto space-y-6 px-5 py-6">
-                <div className="flex items-center justify-between">
-                    <h6 className="text-2x font-bold">Edit Permissions</h6>
-                </div>
+        onClose();
+      },
+      onError: (err) => {
+        console.error("Update failed:", err);
+      },
+    });
+  };
 
-                <form onSubmit={handleSubmit}>
-                    <div className="grid gap-3 py-4">
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Edit Permission</DialogTitle>
+        </DialogHeader>
 
-                        <div className="grid gap-2">
-                            <Label htmlFor="name">Name</Label>
-                            <Input
-                                id="name"
-                                value={data.name}
-                                placeholder="Name"
-                                onChange={(e) => setData('name', e.target.value)}
-                            />
-                            <InputError message={errors.name} className="mt-2" />
-                        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="name" className="text-sm font-medium">Permission Name</label>
+            <Input
+              id="name"
+              value={data.name}
+              onChange={(e) => setData("name", e.target.value)}
+              placeholder="e.g., edit users"
+              disabled={processing}
+            />
+            <InputError message={errors.name} className="mt-1" />
+          </div>
 
-
-                    </div>
-                    <div className="flex justify-end ">
-                        <Button type="submit" disabled={processing}>
-                            {processing ? <>
-                                <Loader2Icon className="mr-2 h-4 w-4 animate-spin" /> Updating...
-                            </> : 'Update'}
-                        </Button>
-                    </div>
-                </form>
-            </div>
-
-
-        </AppLayout>
-    );
+          <div className="flex justify-end">
+            <Button type="submit" disabled={processing}>
+              {processing && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
+              Update
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
 }
