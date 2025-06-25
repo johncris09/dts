@@ -6,6 +6,7 @@ use App\Http\Resources\OfficeResource;
 use App\Models\Office;
 use App\Http\Requests\StoreOfficeRequest;
 use App\Http\Requests\UpdateOfficeRequest;
+use Illuminate\Database\QueryException;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -108,12 +109,28 @@ class OfficeController extends Controller
     public function destroy(Office $office)
     {
 
+
         Gate::authorize('delete offices');
 
-        $office->delete();
+        try {
+            $office->delete();
 
-        return redirect()
-            ->route('offices.index')
-            ->with('success', 'Office deleted successfully!');
+            return redirect()
+                ->route('offices.index')
+                ->with('success', 'Office deleted successfully!');
+        } catch (QueryException $e) {
+            if ($e->getCode() === '23000') {
+
+                return redirect()
+                    ->route('offices.index')
+                    ->with('error', 'Cannot delete this office because it is associated with other records.');
+            }
+
+
+            return redirect()
+                ->route('offices.index')
+                ->with('error', 'An unexpected error occurred!');
+        }
+
     }
 }
