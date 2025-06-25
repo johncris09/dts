@@ -65,11 +65,14 @@ export default function Users() {
                             <InputError message={errors.name} className="mt-2" />
                         </div>
                     </div>
-                    <Button type="submit" disabled={processing}>
-                        {processing ? <>
-                            <Loader2Icon className="mr-2 h-4 w-4 animate-spin" /> Saving...
-                        </> : 'Save'}
-                    </Button>
+                    <div className="flex justify-end ">
+
+                        <Button type="submit" disabled={processing}>
+                            {processing ? <>
+                                <Loader2Icon className="mr-2 h-4 w-4 animate-spin" /> Saving...
+                            </> : 'Save'}
+                        </Button>
+                    </div>
                 </form>
             </div>
 

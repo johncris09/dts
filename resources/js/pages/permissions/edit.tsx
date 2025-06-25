@@ -66,12 +66,13 @@ export default function Users({ permission }: PageProps) {
 
 
                     </div>
-
-                    <Button type="submit" disabled={processing}>
-                        {processing ? <>
-                            <Loader2Icon className="mr-2 h-4 w-4 animate-spin" /> Updating...
-                        </> : 'Update'}
-                    </Button>
+                    <div className="flex justify-end ">
+                        <Button type="submit" disabled={processing}>
+                            {processing ? <>
+                                <Loader2Icon className="mr-2 h-4 w-4 animate-spin" /> Updating...
+                            </> : 'Update'}
+                        </Button>
+                    </div>
                 </form>
             </div>
 
