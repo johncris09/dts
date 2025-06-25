@@ -1,11 +1,11 @@
 import { Head, router } from "@inertiajs/react";
 import { BreadcrumbItem, PageProps } from "@/types";
 import { Button } from "@/components/ui/button";
-import { columns } from "./columns";
 import AppLayout from "@/layouts/app-layout";
 import { Plus } from "lucide-react";
 import { DataTable } from "@/components/ui/data-table";
 import { can } from "@/lib/can";
+import { getColumns } from "./columns";
 
 export default function Divisions({ divisions }: PageProps) {
     const breadcrumbs: BreadcrumbItem[] = [
@@ -26,7 +26,7 @@ export default function Divisions({ divisions }: PageProps) {
                     </Button>}
 
                 </div>
-                <DataTable columns={columns} data={divisions.data} meta={divisions.meta} />
+                <DataTable columns={getColumns()} data={divisions.data} meta={divisions.meta} />
             </div>
 
 

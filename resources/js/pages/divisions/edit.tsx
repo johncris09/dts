@@ -34,6 +34,7 @@ export default function Divisions({ division, offices }: PageProps) {
 
 
     const { data, setData, patch, errors, processing, reset } = useForm<Required<DivisionForm>>({
+        id: division.id || "",
         name: division.name || "",
         description: division.description || "",
         office_id: division.office_id || "",
@@ -118,12 +119,15 @@ export default function Divisions({ division, offices }: PageProps) {
 
                     </div>
 
+                    <div className="flex justify-end ">
+                        <Button type="submit" disabled={processing}>
+                            {processing ? <>
+                                <Loader2Icon className="mr-2 h-4 w-4 animate-spin" /> Updating...
+                            </> : 'Update'}
+                        </Button>
+                    </div>
 
-                    <Button type="submit" disabled={processing}>
-                        {processing ? <>
-                            <Loader2Icon className="mr-2 h-4 w-4 animate-spin" /> Updating...
-                        </> : 'Update'}
-                    </Button>
+
                 </form>
             </div>
         </AppLayout>

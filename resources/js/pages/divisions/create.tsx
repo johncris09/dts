@@ -106,7 +106,7 @@ export default function Divisions({ offices }: PageProps) {
                                 <SelectTrigger className="h-8 w-full">
                                     <SelectValue placeholder="Select office" />
                                 </SelectTrigger>
-                                <SelectContent side="top">
+                                <SelectContent side="bottom">
                                     {offices.map((office, index) => {
                                         return (
                                             <SelectItem key={index} value={String(office.id)}>
@@ -121,11 +121,13 @@ export default function Divisions({ offices }: PageProps) {
 
                     </div>
 
-                    <Button type="submit" disabled={processing}>
-                        {processing ? <>
-                            <Loader2Icon className="mr-2 h-4 w-4 animate-spin" /> Saving...
-                        </> : 'Save'}
-                    </Button>
+                    <div className="flex justify-end ">
+                        <Button type="submit" disabled={processing}>
+                            {processing ? <>
+                                <Loader2Icon className="mr-2 h-4 w-4 animate-spin" /> Saving...
+                            </> : 'Save'}
+                        </Button>
+                    </div>
                 </form>
             </div>
         </AppLayout>
