@@ -17,6 +17,7 @@ import { toast } from "sonner";
 
 
 type RegisterForm = {
+    id: number;
     name: string;
     email: string;
     office_id: number | string,
@@ -36,6 +37,7 @@ export default function Users({ user, roles, offices, divisions }: PageProps) {
         },
     ];
     const { data, setData, patch, errors, processing, reset } = useForm<Required<RegisterForm>>({
+        id: user.id || "",
         name: user.name || "",
         email: user.email || "",
         office_id: user.office_id || "",
@@ -195,12 +197,13 @@ export default function Users({ user, roles, offices, divisions }: PageProps) {
                             <InputError message={errors.roles} />
                         </div>
                     </div>
-
-                    <Button type="submit" disabled={processing}>
-                        {processing ? <>
-                            <Loader2Icon className="mr-2 h-4 w-4 animate-spin" /> Updating...
-                        </> : 'Update'}
-                    </Button>
+                    <div className="flex justify-end ">
+                        <Button type="submit" disabled={processing}>
+                            {processing ? <>
+                                <Loader2Icon className="mr-2 h-4 w-4 animate-spin" /> Updating...
+                            </> : 'Update'}
+                        </Button>
+                    </div>
                 </form>
             </div>
 

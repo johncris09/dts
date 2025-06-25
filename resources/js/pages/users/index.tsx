@@ -1,11 +1,11 @@
 import { Head, router } from "@inertiajs/react";
 import { BreadcrumbItem, PageProps } from "@/types";
 import { Button } from "@/components/ui/button";
-import { columns } from "./columns";
 import AppLayout from "@/layouts/app-layout";
 import { Plus } from "lucide-react";
 import { DataTable } from "@/components/ui/data-table";
 import { can } from "@/lib/can";
+import { getColumns } from "./columns";
 
 export default function Users({ users }: PageProps) {
     const breadcrumbs: BreadcrumbItem[] = [
@@ -27,7 +27,7 @@ export default function Users({ users }: PageProps) {
 
 
                 </div>
-                <DataTable columns={columns} data={users.data} meta={users.meta} />
+                <DataTable columns={getColumns()} data={users.data} meta={users.meta} />
             </div>
 
 

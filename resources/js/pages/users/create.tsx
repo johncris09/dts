@@ -226,12 +226,14 @@ export default function Users({ roles, offices, divisions }: PageProps) {
                             <InputError message={errors.roles} />
                         </div>
                     </div>
+                    <div className="flex justify-end ">
+                        <Button type="submit" disabled={processing}>
+                            {processing ? <>
+                                <Loader2Icon className="mr-2 h-4 w-4 animate-spin" /> Saving...
+                            </> : 'Save'}
+                        </Button>
+                    </div>
 
-                    <Button type="submit" disabled={processing}>
-                        {processing ? <>
-                            <Loader2Icon className="mr-2 h-4 w-4 animate-spin" /> Saving...
-                        </> : 'Save'}
-                    </Button>
                 </form>
             </div>
         </AppLayout>
