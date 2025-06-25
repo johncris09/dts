@@ -23,6 +23,7 @@ export default function Offices({ office }: PageProps) {
         },
     ];
     const { data, setData, patch, errors, processing, reset } = useForm<Required<OfficeForm>>({
+        id: office.id || "",
         name: office.name || "",
         description: office.description || "",
     });
