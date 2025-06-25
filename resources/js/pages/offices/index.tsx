@@ -1,4 +1,4 @@
-import { Head, router } from "@inertiajs/react";
+import { Head, router, usePage } from "@inertiajs/react";
 import { BreadcrumbItem, PageProps } from "@/types";
 import { Button } from "@/components/ui/button";
 
@@ -9,6 +9,7 @@ import { can } from "@/lib/can";
 import { getColumns } from "./columns";
 
 export default function Offices({ offices }: PageProps) {
+
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Offices',
