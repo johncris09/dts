@@ -7,6 +7,7 @@ import InputError from "@/components/input-error";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { FormEventHandler } from "react";
 
 
 type RoleForm = {
@@ -29,7 +30,8 @@ export default function Users({ permissions }: PageProps) {
         permissions: [],
     });
 
-    const handleSubmit = (e) => {
+
+    const handleSubmit: FormEventHandler = (e) => {
         e.preventDefault();
         post(route(`roles.store`), {
             preserveScroll: true,
@@ -96,11 +98,14 @@ export default function Users({ permissions }: PageProps) {
 
                     </div>
 
-                    <Button type="submit" disabled={processing}>
-                        {processing ? <>
-                            <Loader2Icon className="mr-2 h-4 w-4 animate-spin" /> Saving...
-                        </> : 'Save'}
-                    </Button>
+                    <div className="flex justify-end ">
+
+                        <Button type="submit" disabled={processing}>
+                            {processing ? <>
+                                <Loader2Icon className="mr-2 h-4 w-4 animate-spin" /> Saving...
+                            </> : 'Save'}
+                        </Button>
+                    </div>
                 </form>
             </div>
         </AppLayout>

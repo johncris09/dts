@@ -7,6 +7,7 @@ import InputError from "@/components/input-error";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { FormEventHandler } from "react";
 
 
 type RoleForm = {
@@ -30,7 +31,8 @@ export default function Users({ role, permissions }: PageProps) {
             : [],
     });
 
-    const handleSubmit = (e) => {
+
+    const handleSubmit: FormEventHandler = (e) => {
         e.preventDefault();
 
         patch(route(`roles.update`, role), {
@@ -99,11 +101,13 @@ export default function Users({ role, permissions }: PageProps) {
 
                     </div>
 
-                    <Button type="submit" disabled={processing}>
-                        {processing ? <>
-                            <Loader2Icon className="mr-2 h-4 w-4 animate-spin" /> Updating...
-                        </> : 'Update'}
-                    </Button>
+                    <div className="flex justify-end ">
+                        <Button type="submit" disabled={processing}>
+                            {processing ? <>
+                                <Loader2Icon className="mr-2 h-4 w-4 animate-spin" /> Updating...
+                            </> : 'Update'}
+                        </Button>
+                    </div>
                 </form>
             </div>
 

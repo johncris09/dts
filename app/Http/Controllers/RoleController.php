@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\RoleResource;
 use App\Http\Requests\StoreRoleRequest;
 use App\Http\Requests\UpdateRoleRequest;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Permission;
@@ -110,8 +111,26 @@ class RoleController extends Controller
      */
     public function destroy(Role $role)
     {
-        //
-
         Gate::authorize('delete roles');
+
+        try {
+            $role->delete();
+
+            return redirect()
+                ->route('roles.index')
+                ->with('success', 'Role deleted successfully!');
+        } catch (QueryException $e) {
+            if ($e->getCode() === '23000') {
+
+                return redirect()
+                    ->route('roles.index')
+                    ->with('error', 'Cannot delete this office because it is associated with other records.');
+            }
+
+
+            return redirect()
+                ->route('roles.index')
+                ->with('error', 'An unexpected error occurred!');
+        }
     }
 }

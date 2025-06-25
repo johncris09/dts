@@ -1,11 +1,11 @@
 import { Head, router } from "@inertiajs/react";
 import { BreadcrumbItem, PageProps } from "@/types";
 import { Button } from "@/components/ui/button";
-import { columns } from "./columns";
 import AppLayout from "@/layouts/app-layout";
 import { Plus } from "lucide-react";
 import { DataTable } from "@/components/ui/data-table";
 import { can } from "@/lib/can";
+import { getColumns } from "./columns";
 
 export default function Users({ roles }: PageProps) {
 
@@ -29,7 +29,7 @@ export default function Users({ roles }: PageProps) {
                         </Button>}
 
                 </div>
-                <DataTable columns={columns} data={roles.data} meta={roles.meta} />
+                <DataTable columns={getColumns()} data={roles.data} meta={roles.meta} />
             </div>
 
         </AppLayout>
