@@ -31,7 +31,8 @@ class RoleController extends Controller
             ->orderBy('id', 'desc')
             ->paginate($perPage);
         return Inertia::render('roles/index', [
-            'roles' => RoleResource::collection($roles)
+            'roles' => RoleResource::collection($roles),
+            'permissions' => Permission::pluck('name'),
         ]);
     }
 
@@ -46,6 +47,7 @@ class RoleController extends Controller
 
         return Inertia::render('roles/create', [
             'permissions' => $permissions,
+
         ]);
     }
 
