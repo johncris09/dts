@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input"; import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { useEffect, useState } from "react";
+import { FormEventHandler, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 
@@ -46,7 +46,8 @@ export default function Users({ user, roles, offices, divisions }: PageProps) {
             ? user.roles.map((p) => p.name)
             : [],
     });
-    const handleSubmit = (e) => {
+
+    const handleSubmit: FormEventHandler = (e) => {
         e.preventDefault();
         patch(route(`users.update`, user), {
             preserveScroll: true,

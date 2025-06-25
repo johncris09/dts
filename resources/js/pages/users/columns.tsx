@@ -1,6 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "@/components/ui/data-table-column-header";
 import { RowActions } from "@/components/DataTable/RowActions";
 import { Badge } from "@/components/ui/badge";
