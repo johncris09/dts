@@ -10,6 +10,7 @@ import { toast } from "sonner";
 
 
 type OfficeForm = {
+    id: number,
     name: string;
     description: string;
 };

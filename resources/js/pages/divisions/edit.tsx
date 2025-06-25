@@ -18,6 +18,7 @@ import { toast } from "sonner";
 
 
 type DivisionForm = {
+    id: number,
     name: string;
     description: string;
     office_: number;
