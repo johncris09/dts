@@ -6,80 +6,82 @@ import { router } from "@inertiajs/react";
 import { toast } from "sonner";
 
 export type Permission = {
-    id: number;
-    name: string;
+  id: number;
+  name: string;
 };
 
-export const getColumns = () => {
+type ColumnProps = {
+  onEdit: (permission: Permission) => void;
+};
 
-
-    const columns: ColumnDef<Permission>[] = [
-
-        ...(can('edit permissions') || can('delete permissions') ? [
-            {
-                id: "actions",
-                accessorKey: "Action",
-                cell: ({ row }) => {
-                    const permission = row.original;
-
-                    return (
-                        <RowActions
-                            item={permission}
-                            actions={[
-                                ...(can('edit permissions') ? [{
-                                    label: "Edit",
-                                    href: route("permissions.edit", permission),
-                                }] : []),
-
-                                ...(can('delete permissions') ? [{
-                                    label: "Delete",
-                                    requiresConfirmation: true,
-                                    onClick: () => {
-                                        router.delete(route(`permissions.destroy`, permission), {
-                                            preserveScroll: true,
-                                            onSuccess: (response) => {
-                                                const { flash } = response?.props
-                                                if (flash.error) {
-                                                    toast.error('Error', {
-                                                        description: flash.error
-                                                    });
-                                                }
-                                                if (flash.success) {
-                                                    toast.success('Success', {
-                                                        description: flash.success
-                                                    });
-                                                }
-                                            },
-                                            onError: (errors) => {
-                                                console.error(errors);
-                                            },
-
-                                        });
-                                    },
-                                },] : []),
-
-
-                            ]}
-                        />
-                    );
-                },
-            },
-        ] : []),
+export const getColumns = ({ onEdit }: ColumnProps): ColumnDef<Permission>[] => [
+  ...(can("edit permissions") || can("delete permissions")
+    ? [
         {
-            accessorKey: "name",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Name" />
-            ),
-            cell: ({ row }) => (
-                <div className='break-words whitespace-normal capitalize'>
-                    {row.getValue('name')}
-                </div>
-            ),
-            enableSorting: true,
-            enableHiding: true,
+          id: "actions",
+          accessorKey: "action",
+          header: "Action",
+          cell: ({ row }) => {
+            const permission = row.original;
+
+            return (
+              <RowActions
+                item={permission}
+                actions={[
+                  ...(can("edit permissions")
+                    ? [
+                        {
+                          label: "Edit",
+                          onClick: () => onEdit(permission),
+                        },
+                      ]
+                    : []),
+                  ...(can("delete permissions")
+                    ? [
+                        {
+                          label: "Delete",
+                          requiresConfirmation: true,
+                          onClick: () => {
+                            router.delete(route("permissions.destroy", permission.id), {
+                              preserveScroll: true,
+                              onSuccess: (response) => {
+                                const flash = response?.props?.flash;
+                                if (flash?.error) {
+                                  toast.error("Error", { description: flash.error });
+                                }
+                                if (flash?.success) {
+                                  toast.success("Success", { description: flash.success });
+                                }
+                              },
+                              onError: (errors) => {
+                                console.error(errors);
+                              },
+                            });
+                          },
+                        },
+                      ]
+                    : []),
+                ]}
+              />
+            );
+          },
+          enableSorting: false,
+          enableHiding: false,
         },
-    ];
+      ]
+    : []),
 
-    return columns;
-
-}
+  {
+    accessorKey: "name",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Name" />
+    ),
+    cell: ({ row }) => (
+      <div className="break-words whitespace-normal capitalize">
+        {row.getValue("name")}
+      </div>
+    ),
+    enableSorting: true,
+    enableHiding: true,
+  },
+];

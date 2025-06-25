@@ -1,82 +1,70 @@
 import { Head, useForm } from "@inertiajs/react";
 import { BreadcrumbItem } from "@/types";
-import { Button } from "@/components/ui/button";
 import AppLayout from "@/layouts/app-layout";
-import { Loader2Icon } from "lucide-react";
-import InputError from "@/components/input-error";
+import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import InputError from "@/components/input-error";
+import { Loader2Icon } from "lucide-react";
 import { toast } from "sonner";
-import { FormEventHandler } from "react";
 
+export default function CreatePermissionPage() {
+  const breadcrumbs: BreadcrumbItem[] = [
+    { title: "Permissions / Create", href: "/permissions/create" },
+  ];
 
-type RoleForm = {
-    name: string;
-};
+  const { data, setData, post, processing, errors, reset } = useForm({
+    name: "",
+  });
 
-export default function Users() {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
 
-    const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Permissions / Create',
-            href: '/permissions/create',
-        },
-    ];
-
-
-    const { data, setData, post, errors, processing, reset } = useForm<RoleForm>({
-        name: "",
-    });
-
-    const handleSubmit: FormEventHandler = (e) => {
-        e.preventDefault();
-
-        post(route(`permissions.store`), {
-            preserveScroll: true,
-            onSuccess: () => {
-                toast.success('Success', {
-                    description: `Permission updated successfully`,
-                });
-                reset();
-            },
-            onError: (errors) => {
-                console.error(errors);
-            },
+    post(route("permissions.store"), {
+      preserveScroll: true,
+      onSuccess: () => {
+        toast.success("Success", {
+          description: "Permission created successfully",
         });
-    };
-    return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Create Permissions" />
-            <div className="container mx-auto space-y-6 px-5 py-6">
-                <div className="flex items-center justify-between">
-                    <h6 className="text-2x font-bold">Create Permissions</h6>
-                </div>
+        reset();
+      },
+      onError: (errors) => {
+        console.error(errors);
+      },
+    });
+  };
 
-                <form onSubmit={handleSubmit}>
-                    <div className="grid gap-3 py-4">
+  return (
+    <AppLayout breadcrumbs={breadcrumbs}>
+      <Head title="Create Permission" />
+      <div className="container mx-auto px-5 py-6 space-y-6">
+        <div className="flex items-center justify-between">
+          <h6 className="text-2xl font-bold">Create Permission</h6>
+        </div>
 
-                        <div className="grid gap-2">
-                            <Label htmlFor="name">Name</Label>
-                            <Input
-                                id="name"
-                                value={data.name}
-                                placeholder="Name"
-                                onChange={(e) => setData('name', e.target.value)}
-                            />
-                            <InputError message={errors.name} className="mt-2" />
-                        </div>
-                    </div>
-                    <div className="flex justify-end ">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="name">Permission Name</Label>
+            <Input
+              id="name"
+              value={data.name}
+              placeholder="e.g., create users"
+              onChange={(e) => setData("name", e.target.value)}
+              disabled={processing}
+            />
+            <InputError message={errors.name} className="mt-1" />
+          </div>
 
-                        <Button type="submit" disabled={processing}>
-                            {processing ? <>
-                                <Loader2Icon className="mr-2 h-4 w-4 animate-spin" /> Saving...
-                            </> : 'Save'}
-                        </Button>
-                    </div>
-                </form>
-            </div>
-
-        </AppLayout>
-    );
+          <div className="flex justify-end">
+            <Button type="submit" disabled={processing}>
+              {processing && (
+                <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              Save
+            </Button>
+          </div>
+        </form>
+      </div>
+    </AppLayout>
+  );
 }
