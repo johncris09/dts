@@ -45,10 +45,18 @@ export const getColumns = () => {
                                     onClick: () => {
                                         router.delete(route(`users.destroy`, user), {
                                             preserveScroll: true,
-                                            onSuccess: () => {
-                                                toast.success('Success', {
-                                                    description: `Office deleted successfully`,
-                                                });
+                                            onSuccess: (response) => {
+                                                const { flash } = response?.props
+                                                if (flash.error) {
+                                                    toast.error('Error', {
+                                                        description: flash.error
+                                                    });
+                                                }
+                                                if (flash.success) {
+                                                    toast.success('Success', {
+                                                        description: flash.success
+                                                    });
+                                                }
                                             },
                                             onError: (errors) => {
                                                 console.error(errors);
