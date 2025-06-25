@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateDivisionRequest extends FormRequest
 {
@@ -22,7 +23,7 @@ class UpdateDivisionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required'],
+            'name' => ['required', Rule::unique('divisions')->ignore($this->id)],
             'description' => ['required'],
             'office_id' => ['required'],
         ];

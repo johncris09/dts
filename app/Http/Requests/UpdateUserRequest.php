@@ -31,7 +31,7 @@ class UpdateUserRequest extends FormRequest
                 'lowercase',
                 'email',
                 'max:255',
-                // Rule::unique('users')->ignore($this->id),
+                Rule::unique('users')->ignore($this->id),
             ],
             'roles' => ['required'],
             'office_id' => ['nullable'],
