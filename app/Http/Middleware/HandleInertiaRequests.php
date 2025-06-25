@@ -52,6 +52,16 @@ class HandleInertiaRequests extends Middleware
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],
+
+            'flash' => function () {
+                return [
+                    'message' => session('message'),
+                    'success' => session('success'),
+                    'error' => session('error'),
+                    'info' => session('info'),
+                    'photo' => session('photo'),
+                ];
+            },
             'sidebarOpen' => !$request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }
