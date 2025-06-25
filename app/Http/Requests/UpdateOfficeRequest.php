@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 class UpdateOfficeRequest extends FormRequest
@@ -23,7 +24,7 @@ class UpdateOfficeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string'],
+            'name' => ['required', Rule::unique('offices')->ignore($this->id)],
             'description' => ['required'],
         ];
     }
