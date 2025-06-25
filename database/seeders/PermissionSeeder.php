@@ -13,6 +13,14 @@ class PermissionSeeder extends Seeder
     public function run(): void
     {
         $permissions = [
+            'view offices',
+            'create offices',
+            'edit offices',
+            'delete offices',
+            'view divisions',
+            'create divisions',
+            'edit divisions',
+            'delete divisions',
             'view users',
             'create users',
             'edit users',
@@ -21,7 +29,6 @@ class PermissionSeeder extends Seeder
             'create divisions',
             'edit divisions',
             'delete divisions',
-            'view offices',
             'view permissions',
             'create permissions',
             'edit permissions',
