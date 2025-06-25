@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePermissionRequest;
 use App\Http\Requests\UpdatePermissionRequest;
 use App\Http\Resources\PermissionResource;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Permission;
@@ -36,7 +37,7 @@ class PermissionController extends Controller
     {
         Gate::authorize('create permissions');
 
-        return Inertia::render('permissions/create' );
+        return Inertia::render('permissions/create');
     }
 
     /**
@@ -95,6 +96,26 @@ class PermissionController extends Controller
     public function destroy(Permission $permission)
     {
 
-        Gate::authorize(  'delete permissions');
+        Gate::authorize('delete permissions');
+
+        try {
+            $permission->delete();
+
+            return redirect()
+                ->route('permissions.index')
+                ->with('success', 'Permissions deleted successfully!');
+        } catch (QueryException $e) {
+            if ($e->getCode() === '23000') {
+
+                return redirect()
+                    ->route('permissions.index')
+                    ->with('error', 'Cannot delete this office because it is associated with other records.');
+            }
+
+
+            return redirect()
+                ->route('permissions.index')
+                ->with('error', 'An unexpected error occurred!');
+        }
     }
 }
