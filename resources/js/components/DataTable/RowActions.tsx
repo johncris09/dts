@@ -80,9 +80,8 @@ export function RowActions({ item, actions }: RowActionsProps) {
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Are you sure?</DialogTitle>
-                        <DialogDescription>
-                            {requiresConfirmationAction.confirmationMessage}
-                        </DialogDescription>
+                        <DialogDescription>Are you sure you want to delete the data? This action cannot be undone.</DialogDescription>
+
                     </DialogHeader>
                     <DialogFooter>
                         <DialogClose asChild>
