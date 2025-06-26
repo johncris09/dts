@@ -1,5 +1,5 @@
 import { Head } from "@inertiajs/react";
-import { BreadcrumbItem } from "@/types";
+import { BreadcrumbItem, Meta } from "@/types";
 import { Button } from "@/components/ui/button";
 
 import { Input } from '@/components/ui/input';
@@ -14,16 +14,7 @@ import { useState } from "react";
 import InputError from "@/components/input-error";
 import type { Office } from './columns';
 
-type Meta = {
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    from: number;
-    to: number;
-    path: string;
-    links: { url: string | null; label: string; active: boolean; }[];
-};
+
 
 interface OfficesProps {
     offices: {
