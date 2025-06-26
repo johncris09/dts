@@ -38,10 +38,14 @@ export default function CreatePermissionModal({ isOpen, onClose }) {
                     />
                     <InputError message={errors.name} />
 
-                    <Button type="submit" disabled={processing}>
-                        {processing && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
+                    <div className="flex justify-end pt-2">
+                        <Button type="submit" disabled={processing}>
+                        {processing && (
+                            <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                        )}
                         Create
-                    </Button>
+                        </Button>
+                    </div>
                 </form>
             </DialogContent>
         </Dialog>
