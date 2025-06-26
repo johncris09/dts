@@ -41,14 +41,8 @@ class RoleController extends Controller
      */
     public function create()
     {
+        abort(404, 'This page does not exist.');
 
-        Gate::authorize('create roles');
-        $permissions = Permission::pluck('name');
-
-        return Inertia::render('roles/create', [
-            'permissions' => $permissions,
-
-        ]);
     }
 
     /**
@@ -71,7 +65,8 @@ class RoleController extends Controller
      */
     public function show(Role $role)
     {
-        //
+        abort(404, 'This page does not exist.');
+
     }
 
     /**
@@ -80,15 +75,8 @@ class RoleController extends Controller
     public function edit(Role $role)
     {
 
-        Gate::authorize('edit roles');
+        abort(404, 'This page does not exist.');
 
-        $permissions = Permission::pluck('name');
-        $role->load('permissions');
-        return Inertia::render('roles/edit', [
-            'permissions' => $permissions,
-            'role' => $role,
-
-        ]);
     }
 
     /**
