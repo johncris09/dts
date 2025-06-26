@@ -124,13 +124,14 @@ export default function EditRoleModal({
             ))}
             <InputError message={errors.permissions} className="mt-2" />
           </div>
-
-          <Button type="submit" disabled={processing}>
-            {processing && (
-              <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-            )}
-            Save
-          </Button>
+          <div className="flex justify-end pt-2">
+            <Button type="submit" disabled={processing}>
+              {processing && (
+                <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              Update
+            </Button>
+          </div> 
         </form>
       </DialogContent>
     </Dialog>

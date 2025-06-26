@@ -72,7 +72,7 @@ export default function EditPermissionModal({ isOpen, onClose, permission }: Pro
             <InputError message={errors.name} className="mt-1" />
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex justify-end pt-2">
             <Button type="submit" disabled={processing}>
               {processing && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
               Update
