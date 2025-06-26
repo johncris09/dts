@@ -43,11 +43,7 @@ class OfficeController extends Controller
     public function create()
     {
 
-        Gate::authorize('create offices');
-
-        return Inertia::render(
-            'offices/create',
-        );
+        abort(404, 'This page does not exist.');
     }
 
     /**
@@ -78,14 +74,7 @@ class OfficeController extends Controller
     public function edit(Office $office)
     {
 
-        Gate::authorize('edit offices');
-
-        return Inertia::render(
-            'offices/edit',
-            [
-                'office' => $office,
-            ]
-        );
+        abort(404, 'This page does not exist.');
     }
 
     /**

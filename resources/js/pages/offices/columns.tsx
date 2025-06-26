@@ -4,14 +4,16 @@ import { RowActions } from "@/components/DataTable/RowActions";
 import { router } from "@inertiajs/react";
 import { toast } from "sonner";
 import { can } from "@/lib/can";
+
 export type Office = {
-    id: number;
+    id: string | number | '';
     name: string;
     description: string;
 };
 
-export const getColumns = () => {
+type HandleOpenModal = (data: Office) => void;
 
+export const getColumns = (handleOpenModal: HandleOpenModal) => {
 
     const columns: ColumnDef<Office>[] = [
 
@@ -19,7 +21,7 @@ export const getColumns = () => {
             {
                 id: "actions",
                 accessorKey: "Action",
-                cell: ({ row }) => {
+                cell: ({ row }: { row: { original: Office } }) => {
                     const office = row.original;
 
                     return (
@@ -28,7 +30,9 @@ export const getColumns = () => {
                             actions={[
                                 ...(can('edit offices') ? [{
                                     label: "Edit",
-                                    href: route("offices.edit", office),
+                                    onClick: () => {
+                                        handleOpenModal(office)
+                                    },
                                 }] : []),
 
                                 ...(can('delete offices') ? [{
@@ -38,13 +42,13 @@ export const getColumns = () => {
                                         router.delete(route(`offices.destroy`, office), {
                                             preserveScroll: true,
                                             onSuccess: (response) => {
-                                                const { flash } = response?.props
-                                                if (flash.error) {
+                                                const flash = (response && typeof response === 'object' && 'props' in response && response.props && typeof response.props === 'object' && 'flash' in response.props) ? (response.props as { flash?: { error?: string; success?: string } }).flash : undefined;
+                                                if (flash?.error) {
                                                     toast.error('Error', {
                                                         description: flash.error
                                                     });
                                                 }
-                                                if (flash.success) {
+                                                if (flash?.success) {
                                                     toast.success('Success', {
                                                         description: flash.success
                                                     });
