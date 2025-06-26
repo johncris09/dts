@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
@@ -177,10 +178,30 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(User $user)
     {
 
         Gate::authorize('delete users');
-        //
+
+
+        try {
+            $user->delete();
+
+            return redirect()
+                ->route('users.index')
+                ->with('success', 'User deleted successfully!');
+        } catch (QueryException $e) {
+            if ($e->getCode() === '23000') {
+
+                return redirect()
+                    ->route('users.index')
+                    ->with('error', 'Cannot delete this office because it is associated with other records.');
+            }
+
+
+            return redirect()
+                ->route('users.index')
+                ->with('error', 'An unexpected error occurred!');
+        }
     }
 }
