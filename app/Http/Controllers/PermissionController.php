@@ -35,9 +35,9 @@ class PermissionController extends Controller
      */
     public function create()
     {
-        Gate::authorize('create permissions');
 
-        return Inertia::render('permissions/create');
+        abort(404, 'This page does not exist.');
+
     }
 
     /**
@@ -59,7 +59,8 @@ class PermissionController extends Controller
      */
     public function show(Permission $permission)
     {
-        //
+        abort(404, 'This page does not exist.');
+
     }
 
     /**
@@ -67,11 +68,9 @@ class PermissionController extends Controller
      */
     public function edit(Permission $permission)
     {
-        Gate::authorize('edit permissions');
 
-        return Inertia::render('permissions/edit', [
-            'permission' => $permission,
-        ]);
+        abort(404, 'This page does not exist.');
+
     }
 
     /**

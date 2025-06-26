@@ -42,3 +42,15 @@ export interface User {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
+
+
+type Meta = {
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    from: number;
+    to: number;
+    path: string;
+    links: { url: string | null; label: string; active: boolean; }[];
+};
