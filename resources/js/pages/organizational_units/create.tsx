@@ -6,7 +6,7 @@ import { Loader2Icon } from "lucide-react";
 import InputError from "@/components/input-error";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { FormEventHandler, useEffect, useState } from "react";
+import { FormEventHandler } from "react";
 import {
     Select,
     SelectContent,
@@ -55,10 +55,10 @@ export default function CreateOrganizationalUnits({ roles, parentUnits }: PagePr
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Create User" />
+            <Head title="Create Organizational Unit" />
             <div className="container mx-auto space-y-6 px-5 py-6">
                 <div className="flex items-center justify-between">
-                    <h6 className="text-2x font-bold">Create User</h6>
+                    <h6 className="text-2x font-bold">Create Organizational Unit</h6>
                 </div>
 
                 <form onSubmit={handleSubmit}>
