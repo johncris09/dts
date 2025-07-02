@@ -3,16 +3,15 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class StoreOfficeRequest extends FormRequest
+class StoreDocumentRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true;
+        return false;
     }
 
     /**
@@ -23,8 +22,7 @@ class StoreOfficeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', Rule::unique('offices')],
-            'description' => ['required'],
+            //
         ];
     }
 }

@@ -1,11 +1,4 @@
 import { Head, useForm, usePage } from "@inertiajs/react";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
 import { BreadcrumbItem, PageProps, SharedData } from "@/types";
 import { Button } from "@/components/ui/button";
 import AppLayout from "@/layouts/app-layout";
@@ -13,40 +6,44 @@ import { Loader2Icon } from "lucide-react";
 import InputError from "@/components/input-error";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { FormEventHandler } from "react";
+import { FormEventHandler, useEffect, useState } from "react";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 
-
-type DivisionForm = {
-    id: number,
+type RegisterForm = {
+    id: number;
     name: string;
     description: string;
-    office_: number;
+    parent_id: number | string,
 };
-
-export default function Divisions({ division, offices }: PageProps) {
+export default function EditOrganizationalUnits({ organizationalUnit, parentUnits }: PageProps) {
     const { auth } = usePage<SharedData>().props
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: 'Divisions / Edit',
-            href: '/divisions/edit',
+            title: 'Organizational Units / Edit',
+            href: '/organizational_units/edit',
         },
     ];
 
-
-    const { data, setData, patch, errors, processing, reset } = useForm<Required<DivisionForm>>({
-        id: division.id || "",
-        name: division.name || "",
-        description: division.description || "",
-        office_id: division.office_id || "",
+    const { data, setData, patch, errors, processing, reset } = useForm<Required<RegisterForm>>({
+        id: organizationalUnit.id || "",
+        name: organizationalUnit.name || "",
+        description: organizationalUnit.description || "",
+        parent_id: organizationalUnit.parent_id || "",
     });
     const handleSubmit: FormEventHandler = (e) => {
         e.preventDefault();
-        patch(route(`divisions.update`, division), {
+        patch(route(`organizational_units.update`, organizationalUnit), {
             preserveScroll: true,
             onSuccess: () => {
                 toast.success('Success', {
-                    description: 'Division updated successfully',
+                    description: `Organizational Unit updated successfully`,
                 });
                 reset();
             },
@@ -54,14 +51,14 @@ export default function Divisions({ division, offices }: PageProps) {
                 console.error(errors);
             },
         });
-
     };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Edit Division" />
+            <Head title="Update Organizational Unit" />
             <div className="container mx-auto space-y-6 px-5 py-6">
                 <div className="flex items-center justify-between">
-                    <h6 className="text-2x font-bold">Edit Division</h6>
+                    <h6 className="text-2x font-bold">Update Organizational Unit</h6>
                 </div>
 
                 <form onSubmit={handleSubmit}>
@@ -82,44 +79,53 @@ export default function Divisions({ division, offices }: PageProps) {
                             />
                             <InputError message={errors.name} className="mt-2" />
                         </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="parent_id">Select Parent Unit</Label>
+                            <Select
+                                value={String(data.parent_id)} // Ensure it’s string
+                                onValueChange={(value) => {
+                                    setData('parent_id', value);
+
+                                }}
+                            >
+                                <SelectTrigger tabIndex={2} className="h-8 w-full">
+                                    <SelectValue placeholder="Select parent unit" />
+                                </SelectTrigger>
+                                <SelectContent side="bottom">
+
+                                    <SelectItem>
+                                        Select
+                                    </SelectItem>
+                                    {parentUnits.map((organizationalUnit, index) => {
+                                        return (
+                                            <SelectItem key={index} value={String(organizationalUnit.id)}>
+                                                {organizationalUnit.hierarchy_path}
+                                            </SelectItem>
+                                        )
+                                    })}
+                                </SelectContent>
+                            </Select>
+                        </div>
                         <div className="grid gap-2">
                             <Label htmlFor="description">Description</Label>
                             <Input
                                 id="description"
-                                type="description"
-                                tabIndex={2}
+                                type="text"
+
+                                autoFocus
+                                tabIndex={3}
                                 autoComplete="description"
                                 value={data.description}
                                 onChange={(e) => setData('description', e.target.value)}
                                 disabled={processing}
                                 placeholder="Description"
                             />
-                            <InputError message={errors.description} />
+                            <InputError message={errors.description} className="mt-2" />
                         </div>
-                        {auth?.roles?.includes('Super Admin') && <div className="grid gap-2">
-                            <Label htmlFor="office">Office</Label>
-                            <Select
-                                value={String(data.office_id)} // Ensure it’s string
-                                onValueChange={(value) => setData('office_id', value)} // Keep as string
-                            >
-                                <SelectTrigger className="h-8 w-full">
-                                    <SelectValue placeholder="Select office" />
-                                </SelectTrigger>
-                                <SelectContent side="top">
-                                    {offices.map((office, index) => {
-                                        return (
-                                            <SelectItem key={index} value={String(office.id)}>
-                                                {office.name} - {office.description}
-                                            </SelectItem>
-                                        )
-                                    })}
-                                </SelectContent>
-                            </Select>
-                            <InputError message={errors.office_id} />
-                        </div>}
+
 
                     </div>
-
                     <div className="flex justify-end ">
                         <Button type="submit" disabled={processing}>
                             {processing ? <>
@@ -127,7 +133,6 @@ export default function Divisions({ division, offices }: PageProps) {
                             </> : 'Update'}
                         </Button>
                     </div>
-
 
                 </form>
             </div>

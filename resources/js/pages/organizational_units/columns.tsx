@@ -3,52 +3,51 @@ import { DataTableColumnHeader } from "@/components/ui/data-table-column-header"
 import { RowActions } from "@/components/DataTable/RowActions";
 import { router } from "@inertiajs/react";
 import { toast } from "sonner";
-import { can } from "@/lib/can";
+import { can } from "@/lib/utils";
 
-export type Office = {
+
+export type OrganizationalUnit = {
     id: string | number | '';
     name: string;
+    parent_id: string | number | '';
     description: string;
 };
 
-type HandleOpenModal = (data: Office) => void;
+type HandleOpenModal = (data: OrganizationalUnit) => void;
 
 export const getColumns = (handleOpenModal: HandleOpenModal) => {
+    const columns: ColumnDef<OrganizationalUnit>[] = [
 
-    const columns: ColumnDef<Office>[] = [
-
-        ...(can('edit offices') || can('delete offices') ? [
+        ...(can('edit organizational units') || can('delete organizational units') ? [
             {
                 id: "actions",
                 accessorKey: "Action",
-                cell: ({ row }: { row: { original: Office } }) => {
-                    const office = row.original;
+                cell: ({ row }: { row: { original: OrganizationalUnit } }) => {
+                    const organizationalUnit = row.original;
 
                     return (
                         <RowActions
-                            item={office}
+                            item={organizationalUnit}
                             actions={[
-                                ...(can('edit offices') ? [{
+                                ...(can('edit organizational units') ? [{
                                     label: "Edit",
-                                    onClick: () => {
-                                        handleOpenModal(office)
-                                    },
+                                    href: route("organizational_units.edit", organizationalUnit),
                                 }] : []),
 
-                                ...(can('delete offices') ? [{
+                                ...(can('delete organizational units') ? [{
                                     label: "Delete",
                                     requiresConfirmation: true,
                                     onClick: () => {
-                                        router.delete(route(`offices.destroy`, office), {
+                                        router.delete(route(`organizational_units.destroy`, organizationalUnit), {
                                             preserveScroll: true,
                                             onSuccess: (response) => {
-                                                const flash = (response && typeof response === 'object' && 'props' in response && response.props && typeof response.props === 'object' && 'flash' in response.props) ? (response.props as { flash?: { error?: string; success?: string } }).flash : undefined;
-                                                if (flash?.error) {
+                                                const { flash } = response?.props
+                                                if (flash.error) {
                                                     toast.error('Error', {
                                                         description: flash.error
                                                     });
                                                 }
-                                                if (flash?.success) {
+                                                if (flash.success) {
                                                     toast.success('Success', {
                                                         description: flash.success
                                                     });
@@ -69,6 +68,22 @@ export const getColumns = (handleOpenModal: HandleOpenModal) => {
                 },
             },
         ] : []),
+
+        {
+            accessorKey: "hierarchy_path",
+            header: ({ column }) => (
+                <DataTableColumnHeader column={column} title="Parent Unit" />
+            ),
+            cell: ({ row }) => {
+                return (
+                    <div className='break-words whitespace-normal capitalize'>
+                        {row.original?.hierarchy_path}
+                    </div>
+                )
+            },
+            enableSorting: true,
+            enableHiding: true,
+        },
         {
             accessorKey: "name",
             header: ({ column }) => (
@@ -82,6 +97,7 @@ export const getColumns = (handleOpenModal: HandleOpenModal) => {
             enableSorting: true,
             enableHiding: true,
         },
+
         {
             accessorKey: "description",
             header: ({ column }) => (

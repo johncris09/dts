@@ -19,18 +19,18 @@ const mainNavItems: NavItem[] = [
         icon: FilesIcon,
         permission: ['view documents']
     },
-    {
-        title: 'Offices',
-        href: '/offices',
-        icon: Building,
-        permission: ['view offices']
-    },
-    {
-        title: 'Divisions',
-        href: '/divisions',
-        icon: Network,
-        permission: ['view divisions']
-    },
+    // {
+    //     title: 'Offices',
+    //     href: '/offices',
+    //     icon: Building,
+    //     permission: ['view offices']
+    // },
+    // {
+    //     title: 'Divisions',
+    //     href: '/divisions',
+    //     icon: Network,
+    //     permission: ['view divisions']
+    // },
     {
         title: 'Received',
         href: '/received',
@@ -60,6 +60,14 @@ const mainNavItems: NavItem[] = [
         href: '/users',
         icon: UserIcon,
         permission: ['view users']
+    },
+
+
+    {
+        title: 'Organizational Units',
+        href: '/organizational_units',
+        icon: Network,
+        permission: ['view organizational units']
     },
     {
         title: 'Roles',

@@ -1,4 +1,4 @@
-import { Head } from "@inertiajs/react";
+import { Head, router } from "@inertiajs/react";
 import { BreadcrumbItem, Meta } from "@/types";
 import { Button } from "@/components/ui/button";
 
@@ -7,34 +7,35 @@ import { Label } from '@/components/ui/label';
 import AppLayout from "@/layouts/app-layout";
 import { Plus } from "lucide-react";
 import { DataTable } from "@/components/ui/data-table";
-import { can } from "@/lib/can";
 import { getColumns } from "./columns";
 import { CrudForm } from "@/components/crud-form";
 import { useState } from "react";
 import InputError from "@/components/input-error";
-import type { Office } from './columns';
+import type { OrganizationalUnit } from './columns';
+import { can } from "@/lib/utils";
 
 
 
-interface OfficesProps {
-    offices: {
-        data: Office[];
+interface OrganizationalUnitsProps {
+    organizationalUnits: {
+        data: OrganizationalUnit[];
         meta?: Meta;
     };
 }
 
-export default function Offices({ offices }: OfficesProps) {
+export default function OrganizationalUnits({ organizationalUnits }: OrganizationalUnitsProps) {
+
     const [open, setOpen] = useState(false);
-    const [selectedData, setSelectedData] = useState<Office | null>(null);
+    const [selectedData, setSelectedData] = useState<OrganizationalUnit | null>(null);
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: 'Offices',
-            href: '/offices',
+            title: 'Organizational Units',
+            href: '/organizational_units',
         },
     ];
 
 
-    const handleOpenModal = (data: Office | null = null) => {
+    const handleOpenModal = (data: OrganizationalUnit | null = null) => {
         setSelectedData(data);
         setOpen(true);
     };
@@ -43,17 +44,21 @@ export default function Offices({ offices }: OfficesProps) {
             <Head title="Offices" />
             <div className="container mx-auto space-y-6 px-5 py-6">
                 <div className="flex items-center justify-between">
-                    <h6 className="text-2x font-bold">Offices</h6>
-                    {can('create offices') && <Button className="cursor-pointer" size={'sm'} onClick={() => handleOpenModal()}>
+                    <h6 className="text-2x font-bold">Organizational Units</h6>
+                    {/* {can('create organizational units') && <Button className="cursor-pointer" size={'sm'} onClick={() => handleOpenModal()}>
+                        <Plus />
+                        Add New
+                    </Button>} */}
+                    {can('create organizational units') && <Button className="cursor-pointer" size={'sm'} onClick={() => router.visit(route('organizational_units.create'))}>
                         <Plus />
                         Add New
                     </Button>}
 
 
                 </div>
-                <DataTable columns={getColumns(handleOpenModal)} data={offices.data} meta={offices.meta} />
+                <DataTable columns={getColumns(handleOpenModal)} data={organizationalUnits.data} meta={organizationalUnits.meta} />
             </div>
-            <CrudForm<Office>
+            <CrudForm<OrganizationalUnit>
                 key={selectedData?.id ?? 'new'} // <-- Add this line
                 open={open}
                 setOpen={(isOpen) => {
@@ -64,10 +69,11 @@ export default function Offices({ offices }: OfficesProps) {
                 initialData={{
                     id: selectedData?.id || "",
                     name: selectedData?.name || "",
+                    parent_id: selectedData?.parent_id || "",
                     description: selectedData?.description || "",
                 }}
                 isEdit={!!selectedData?.id}
-                routeName="offices"
+                routeName="organizational_units"
                 onSuccess={() => setSelectedData(null)}
             >
                 {({ data, setData, errors }) => (

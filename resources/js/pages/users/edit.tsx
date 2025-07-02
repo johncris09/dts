@@ -20,15 +20,16 @@ type RegisterForm = {
     id: number;
     name: string;
     email: string;
-    office_id: number | string,
-    division_id: number | string,
+    organizational_unit_id: number | string,
     password: string;
     password_confirmation: string;
 };
 
-export default function Users({ user, roles, offices, divisions }: PageProps) {
+const restrictedRoles = ['Administrator', 'Receiver'];
+export default function Users({ user, roles, organizationalUnits }: PageProps) {
     const { auth } = usePage<SharedData>().props
-    const [divisionsUnderOffice, setDivisionsUnderOffice] = useState([])
+    const [selectedUnit, setSelectedUnit] = useState(null);
+    const [unitLevel, setUnitLevel] = useState(0);
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -40,8 +41,7 @@ export default function Users({ user, roles, offices, divisions }: PageProps) {
         id: user.id || "",
         name: user.name || "",
         email: user.email || "",
-        office_id: user.office_id || "",
-        division_id: user.division_id || "",
+        organizational_unit_id: user.organizational_unit_id || "",
         roles: user?.roles
             ? user.roles.map((p) => p.name)
             : [],
@@ -63,12 +63,16 @@ export default function Users({ user, roles, offices, divisions }: PageProps) {
         });
     };
 
-    useEffect(() => {
-
-        setDivisionsUnderOffice(divisions.filter(
-            (division) => division.office_id == data.office_id
-        ));
-    }, [])
+    const getUnitLevel = (unitId) => {
+        const unit = organizationalUnits.find(u => String(u.id) === String(unitId));
+        let level = 0;
+        let current = unit;
+        while (current?.parent_id) {
+            current = organizationalUnits.find(u => String(u.id) === String(current.parent_id));
+            level++;
+        }
+        return level;
+    };
 
     const handleRoleChange = (roleName, checked) => {
         if (checked) {
@@ -119,81 +123,64 @@ export default function Users({ user, roles, offices, divisions }: PageProps) {
                             />
                             <InputError message={errors.email} />
                         </div>
-                        {auth?.roles?.includes('Super Admin') && <div className="grid gap-2">
-                            <Label htmlFor="office">Office</Label>
+                        <div className="grid gap-2">
+                            <Label htmlFor="organizational_unit_id">Organizational Unit</Label>
                             <Select
-                                value={String(data.office_id)} // Ensure it’s string
+                                value={String(data.organizational_unit_id)} // Ensure it’s string
                                 onValueChange={(value) => {
-                                    setData('office_id', value)
-                                    setDivisionsUnderOffice(divisions.filter(
-                                        (division) => division.office_id == value
-                                    ));
+                                    setData('organizational_unit_id', value);
+                                    setSelectedUnit(value);
 
-                                    setData('division_id', '')
+                                    const level = getUnitLevel(value);
+                                    setUnitLevel(level);
+
+                                    if (level > 0) {
+                                        setData('roles', data.roles.filter(role => !restrictedRoles.includes(role)));
+                                    }
                                 }}
                             >
-                                <SelectTrigger className="h-8 w-full">
-                                    <SelectValue placeholder="Select office" />
-                                </SelectTrigger>
-                                <SelectContent side="bottom">
-                                    <SelectItem>
-                                        Select
-                                    </SelectItem>
-                                    {offices.map((office, index) => {
-
-
-                                        return (
-                                            <SelectItem key={index} value={String(office.id)}>
-                                                {office.name} - {office.description}
-                                            </SelectItem>
-                                        )
-                                    })}
-                                </SelectContent>
-                            </Select>
-                        </div>}
-
-                        <div className="grid gap-2">
-                            <Label htmlFor="division">Division</Label>
-                            <Select
-                                value={String(data.division_id)} // Ensure it’s string
-                                onValueChange={(value) => setData('division_id', value)} // Keep as string
-                            >
-                                <SelectTrigger className="h-8 w-full">
-                                    <SelectValue placeholder="Select division" />
+                                <SelectTrigger tabIndex={3} className="h-8 w-full">
+                                    <SelectValue placeholder="Select organizational unit" />
                                 </SelectTrigger>
                                 <SelectContent side="bottom">
 
                                     <SelectItem>
                                         Select
                                     </SelectItem>
-                                    {divisionsUnderOffice.map((division, index) => {
+                                    {organizationalUnits.map((organizationalUnit, index) => {
                                         return (
-                                            <SelectItem key={index} value={String(division.id)}>
-                                                {division.name} - {division.description}
+                                            <SelectItem key={index} value={String(organizationalUnit.id)}>
+                                                {organizationalUnit.hierarchy_path}
                                             </SelectItem>
                                         )
                                     })}
                                 </SelectContent>
                             </Select>
                         </div>
+
                         <div className="grid">
-                            <Label htmlFor="role">Roles</Label>
-                            {roles.map((role) => (
-                                <div key={role}>
-                                    <label className="capitalize">
-                                        <input
-                                            id="role"
-                                            type="checkbox"
-                                            name="roles[]"
-                                            checked={data.roles.includes(role)}
-                                            value={role}
-                                            onChange={(e) => handleRoleChange(role, e.target.checked)}
-                                            className="mr-2 "
-                                        />
-                                        {role}
-                                    </label>
-                                </div>
-                            ))}
+                            <Label tabIndex={4} htmlFor="role">Roles</Label>
+                            {roles.map((role) => {
+                                const isDisabled = restrictedRoles.includes(role) && unitLevel > 0;
+
+                                return (
+                                    <div key={role} className={isDisabled ? "cursor-not-allowed" : ""}>
+                                        <label className={`capitalize flex items-center ${isDisabled ? "cursor-not-allowed opacity-50" : ""}`}>
+                                            <input
+                                                id="role"
+                                                type="checkbox"
+                                                name="roles[]"
+                                                checked={data.roles.includes(role)}
+                                                value={role}
+                                                onChange={(e) => handleRoleChange(role, e.target.checked)}
+                                                className="mr-2"
+                                                disabled={isDisabled}
+                                            />
+                                            {role}
+                                        </label>
+                                    </div>
+                                );
+                            })}
 
                             <InputError message={errors.roles} />
                         </div>

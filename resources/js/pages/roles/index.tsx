@@ -7,13 +7,12 @@ import { Button } from "@/components/ui/button";
 import AppLayout from "@/layouts/app-layout";
 import { Plus } from "lucide-react";
 import { DataTable } from "@/components/ui/data-table";
-import { can } from "@/lib/can";
 import { getColumns } from "./columns";
 import { CrudForm } from "@/components/crud-form";
 import InputError from "@/components/input-error";
 import type { Role } from './columns';
 import { Permission } from "../permissions/columns";
-import { groupByAction } from "@/lib/utils";
+import { can, groupByAction } from "@/lib/utils";
 
 export default function Offices({ roles, permissions }: {
     roles: {

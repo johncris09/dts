@@ -18,8 +18,6 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
-            'office' => $this->office,
-            'division' => $this->division,
             'roles' => $this->whenLoaded('roles', function () {
                 return $this->roles->pluck('name');
             }),
@@ -29,6 +27,14 @@ class UserResource extends JsonResource
             'permissions' => $this->whenLoaded('permissions', function () {
                 return $this->permissions->pluck('name');
             }),
+            'organizational_unit' => $this->whenLoaded('organizationalUnit', function () {
+                return [
+                    'id' => $this->organizationalUnit->id,
+                    'name' => $this->organizationalUnit->name,
+                    'hierarchy_path' => $this->organizationalUnit->getHierarchyPath()->pluck('name')->implode(' > '),
+                ];
+            }),
+            'active' => $this->active,
         ];
     }
 }

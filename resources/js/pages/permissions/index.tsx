@@ -8,10 +8,10 @@ import { CrudForm } from "@/components/crud-form";
 import AppLayout from "@/layouts/app-layout";
 import { Plus } from "lucide-react";
 import { DataTable } from "@/components/ui/data-table";
-import { can } from "@/lib/can";
 import { getColumns } from "./columns";
 import { Permission } from "./columns";
 import InputError from "@/components/input-error";
+import { can } from "@/lib/utils";
 
 
 interface PermissionProps {

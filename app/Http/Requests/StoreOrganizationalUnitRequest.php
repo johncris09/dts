@@ -3,10 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
-class UpdateOfficeRequest extends FormRequest
+class StoreOrganizationalUnitRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,8 +23,9 @@ class UpdateOfficeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', Rule::unique('offices')->ignore($this->id)],
-            'description' => ['required'],
+            'name' => ['required', 'string', 'max:255', Rule::unique('organizational_units')],
+            'parent_id' => ['nullable', 'exists:organizational_units,id'],
+            'description' => ['nullable', 'string'],
         ];
     }
 }

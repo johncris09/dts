@@ -11,8 +11,8 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->foreignId('office_id')->after('email')->nullable()->constrained('offices')->onDelete('set null');
-            $table->foreignId('division_id')->after('office_id')->nullable()->constrained('divisions')->onDelete('set null');
+            $table->boolean('active')->after('password')->default(1);
+
         });
     }
 

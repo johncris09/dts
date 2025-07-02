@@ -99,7 +99,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                                 onClick={() => fileInputRef.current?.click()}
                             >
                                 <Avatar className="w-14 h-14 cursor-pointer">
-                                    <AvatarImage src={preview || (auth.user.avatar ? `/storage/${auth.user.avatar}` : "/placeholder.svg?height=128&width=128")}
+                                    <AvatarImage src={preview || (auth.user.avatar ? `/storage/${auth.user.avatar}` : "")}
                                         alt={`${auth.user.name}`} />
                                     <AvatarFallback className="bg-blue-100 text-blue-600 font-medium">
                                         {getInitials(auth.user.name)}

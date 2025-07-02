@@ -3,16 +3,15 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class UpdateDivisionRequest extends FormRequest
+class UpdateDocumentHistoryRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true;
+        return false;
     }
 
     /**
@@ -23,9 +22,7 @@ class UpdateDivisionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', Rule::unique('divisions')->ignore($this->id)],
-            'description' => ['required'],
-            'office_id' => ['required'],
+            //
         ];
     }
 }
