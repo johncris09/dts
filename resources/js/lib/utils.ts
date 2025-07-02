@@ -30,3 +30,20 @@ export function can(permission: string): boolean {
     };
     return auth.permissions.includes(permission);
 }
+
+export function getRoleColor(role) {
+    switch (role) {
+        case "Super Admin":
+            return "bg-purple-100 text-purple-800";
+        case "Administrator":
+            return "bg-red-100 text-red-800";
+        case "Receiver":
+            return "bg-blue-100 text-blue-800";
+        case "Staff":
+            return "bg-green-100 text-green-800";
+        case "User":
+            return "bg-gray-100 text-gray-800";
+        default:
+            return "bg-gray-100 text-gray-800";
+    }
+};
