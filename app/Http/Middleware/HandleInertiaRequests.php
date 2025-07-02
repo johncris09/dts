@@ -44,7 +44,18 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
-                'user' => $request->user(),
+                'user' => fn() => $request->user() ? [
+                    'id' => $request->user()->id,
+                    'name' => $request->user()->name,
+                    'avatar' => $request->user()->avatar,
+                    'active' => $request->user()->active,
+                    'email' => $request->user()->email,
+                    'organizational_unit' => $request->user()->organizationalUnit ? [
+                        'id' => $request->user()->organizationalUnit->id,
+                        'name' => $request->user()->organizationalUnit->name,
+                        'hierarchy_path' => $request->user()->organizationalUnit->getHierarchyPath()->pluck('name')->implode(' > '),
+                    ] : null,
+                ] : null,
                 'permissions' => fn() => $request->user()?->getAllPermissions()->pluck('name') ?? [],
                 'roles' => fn() => $request->user()?->roles->pluck('name') ?? [],
             ],
@@ -64,5 +75,17 @@ class HandleInertiaRequests extends Middleware
             },
             'sidebarOpen' => !$request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
+    }
+    public function getHierarchyPath()
+    {
+        $path = collect([$this]);
+        $current = $this;
+
+        while ($current->parent) {
+            $path->prepend($current->parent);
+            $current = $current->parent;
+        }
+
+        return $path;
     }
 }
