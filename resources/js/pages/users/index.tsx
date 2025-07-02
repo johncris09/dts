@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button";
 import AppLayout from "@/layouts/app-layout";
 import { Plus } from "lucide-react";
 import { DataTable } from "@/components/ui/data-table";
-import { can } from "@/lib/can";
 import { getColumns } from "./columns";
+import { can } from "@/lib/utils";
 
 export default function Users({ users }: PageProps) {
+
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Users',

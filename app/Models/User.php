@@ -24,8 +24,7 @@ class User extends Authenticatable
         'email',
         'password',
         'avatar',
-        'office_id',
-        'division_id'
+        'organizational_unit_id',
     ];
 
     /**
@@ -48,16 +47,42 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'active' => 'boolean',
         ];
     }
 
-    public function division()
-    {
-        return $this->belongsTo(Division::class);
-    }
 
-    public function office()
+
+    /**
+     * Get the organizational unit that owns the User.
+     * A user is linked to the lowest unit they directly belong to.
+     */
+    public function organizationalUnit()
     {
-        return $this->belongsTo(Office::class);
+        return $this->belongsTo(OrganizationalUnit::class, 'organizational_unit_id');
+    }
+    public function hasEffectivePermission($permission): bool
+    {
+        // 1. Check direct user permissions/roles first (Spatie's default behavior)
+        if ($this->hasPermissionTo($permission) || $this->hasRole($permission)) {
+            return true;
+        }
+
+        // 2. Check permissions inherited from organizational units
+        // If the user is assigned to an organizational unit
+        if ($this->organizationalUnit) {
+            $currentUnit = $this->organizationalUnit;
+            do {
+                // Check if the current organizational unit (or any roles assigned to it)
+                // has the permission.
+                if ($currentUnit->hasPermissionTo($permission) || $currentUnit->hasRole($permission)) {
+                    return true;
+                }
+                // Move up to the parent unit in the hierarchy
+                $currentUnit = $currentUnit->parent;
+            } while ($currentUnit); // Continue until the top-level parent (parent_id is null)
+        }
+
+        return false;
     }
 }

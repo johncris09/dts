@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DivisionController;
+use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\OfficeController;
+use App\Http\Controllers\OrganizationalUnitController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\Settings\ProfileController;
@@ -19,8 +21,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/users/{users}/avatar', [ProfileController::class, 'updateAvatar'])->name('user.update_avatar');
     Route::resource('roles', RoleController::class)->middleware('can:view roles');
     Route::resource('permissions', PermissionController::class)->middleware('can:view permissions');
-    Route::resource('offices', OfficeController::class)->middleware('can:view offices');
-    Route::resource('divisions', DivisionController::class)->middleware('can:view divisions');
+     Route::resource('documents', DocumentController::class)->middleware('can:view documents');
+    Route::resource('organizational_units', OrganizationalUnitController::class)->middleware('can:view organizational units');
 });
 
 require __DIR__.'/settings.php';

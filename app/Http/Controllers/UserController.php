@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\OrganizationalUnit;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
@@ -34,28 +36,46 @@ class UserController extends Controller
         $roles = Role::all();
 
 
-        if ($authUser->hasRole('Super Admin')) {
+        // if ($authUser->hasRole('Super Admin')) {
 
-            $users = User::with('roles', 'office.division')
-                ->when($search, function ($query, $search) {
-                    $query->where(function ($query) use ($search) {
-                        $query->where('name', 'like', "%{$search}%")
-                            ->orWhere('email', 'like', "%{$search}%");
-                    });
-                })
-                ->paginate($perPage);
-        } else if ($authUser->hasRole('Administrator')) {
-            // Show users in the same office (and optionally same division)
-            $users = User::with('roles', 'office.division')
-                ->where('office_id', $authUser->office_id)
-                ->when($search, function ($query, $search) {
-                    $query->where(function ($query) use ($search) {
-                        $query->where('name', 'like', "%{$search}%")
-                            ->orWhere('email', 'like', "%{$search}%");
-                    });
-                })
-                ->paginate($perPage);
-        }
+        //     $users = User::with('roles')
+        //         ->when($search, function ($query, $search) {
+        //             $query->where(function ($query) use ($search) {
+        //                 $query->where('name', 'like', "%{$search}%")
+        //                     ->orWhere('email', 'like', "%{$search}%");
+        //             });
+        //         })
+        //         ->paginate($perPage);
+        // } else if ($authUser->hasRole('Administrator')) {
+        //     $users = User::with('roles')
+        //         ->when($search, function ($query, $search) {
+        //             $query->where(function ($query) use ($search) {
+        //                 $query->where('name', 'like', "%{$search}%")
+        //                     ->orWhere('email', 'like', "%{$search}%");
+        //             });
+        //         })
+        //         ->paginate($perPage);
+        // }
+        $users = User::with(['roles', 'organizationalUnit'])
+            ->latest()
+            ->when($search, function ($query, $search) {
+                $query->where(function ($query) use ($search) {
+                    $query->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
+            })
+            ->paginate($perPage);
+
+        $users->getCollection()->transform(function ($user) {
+            if ($user->organizationalUnit) {
+                $user->organizationalUnit->hierarchy_path = $user->organizationalUnit
+                    ->getHierarchyPath()
+                    ->pluck('name')
+                    ->implode(' > ');
+            }
+            return $user;
+        });
+
         return Inertia::render(
             'users/index',
             [
@@ -78,24 +98,45 @@ class UserController extends Controller
         Gate::authorize('create users');
 
         $authUser = auth()->user();
+        $query = OrganizationalUnit::query();
+        $user = Auth::user();
+
+        $organizationalUnits = OrganizationalUnit::with('parent')->orderBy('name')->get();
+
+        $organizationalUnits->transform(function ($unit) {
+            $unit->hierarchy_path = $unit->getHierarchyPath()->pluck('name')->implode(' > ');
+            return $unit;
+        });
 
         if ($authUser->hasRole('Super Admin')) {
+
             $roles = Role::pluck('name');
         } else if ($authUser->hasRole('Administrator')) {
             $roles = Role::where('name', '!=', 'Super Admin')->pluck('name');
         }
 
-        $offices = Office::with(['division'])->orderBy('name')->get();
-        $divisions = Division::with(['office'])->orderBy('name')->get();
-
         return Inertia::render(
             'users/create',
             [
                 'roles' => $roles,
-                'offices' => $offices,
-                'divisions' => $divisions,
+                'organizationalUnits' => $this->buildHierarchy($organizationalUnits),
             ]
         );
+    }
+
+
+    private function buildHierarchy($units, $parentId = null, $level = 0)
+    {
+        $hierarchy = collect();
+
+        foreach ($units->where('parent_id', $parentId)->sortBy('name') as $unit) {
+            $unit->level = $level;
+            $hierarchy->push($unit);
+            $children = $this->buildHierarchy($units, $unit->id, $level + 1);
+            $hierarchy = $hierarchy->merge($children);
+        }
+
+        return $hierarchy;
     }
 
     /**
@@ -135,17 +176,20 @@ class UserController extends Controller
         $authUser = auth()->user();
 
         $user->load('roles');
-        $offices = Office::with(['division'])->orderBy('name')->get();
-        $divisions = Division::with(['office'])->orderBy('name')->get();
+        $organizationalUnits = OrganizationalUnit::with('parent')->orderBy('name')->get();
 
+        $organizationalUnits->transform(function ($unit) {
+            $unit->hierarchy_path = $unit->getHierarchyPath()->pluck('name')->implode(' > ');
+            return $unit;
+        });
 
         if ($authUser->hasRole('Super Admin')) {
             $roles = Role::pluck('name');
         } else if ($authUser->hasRole('Administrator')) {
             // Administrator can edit users under the same office (optional: same division)
-            if ($authUser->office_id !== $user->office_id) {
-                abort(403, 'Unauthorized to edit this user.');
-            }
+            // if ($authUser->office_id !== $user->office_id) {
+            //     abort(403, 'Unauthorized to edit this user.');
+            // }
             $roles = Role::where('name', '!=', 'Super Admin')->pluck('name');
         }
         return Inertia::render(
@@ -153,8 +197,7 @@ class UserController extends Controller
             [
                 'roles' => $roles,
                 'user' => $user,
-                'offices' => $offices,
-                'divisions' => $divisions,
+                'organizationalUnits' => $this->buildHierarchy($organizationalUnits),
             ]
         );
     }
@@ -195,7 +238,7 @@ class UserController extends Controller
 
                 return redirect()
                     ->route('users.index')
-                    ->with('error', 'Cannot delete this office because it is associated with other records.');
+                    ->with('error', 'Cannot delete this User because it is associated with other records.');
             }
 
 

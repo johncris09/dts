@@ -5,8 +5,9 @@ import { RowActions } from "@/components/DataTable/RowActions";
 import { Badge } from "@/components/ui/badge";
 import { getInitials } from "@/hooks/helpers";
 import { Link, router } from "@inertiajs/react";
-import { can } from "@/lib/can";
 import { toast } from "sonner";
+import { can } from "@/lib/utils";
+import { CircleCheck, CircleIcon, CircleXIcon } from "lucide-react";
 
 export type User = {
     id: number;
@@ -85,7 +86,7 @@ export const getColumns = () => {
                     <div className="flex gap-4 items-center">
                         <div className="flex overflow-hidden justify-center items-center font-semibold rounded-full size-10 bg-muted text-primary/80">
                             <Avatar className="w-14 h-14 cursor-pointer">
-                                <AvatarImage src={user.avatar ? `${user.avatar}` : "/placeholder.svg?height=128&width=128"}
+                                <AvatarImage src={user.avatar ? `${user.avatar}` : ""}
                                     alt={`${user.name}`} />
                                 <AvatarFallback className="bg-blue-100 text-blue-600 font-medium">
                                     {getInitials(user.name)}
@@ -126,32 +127,17 @@ export const getColumns = () => {
                 );
             },
         },
+
         {
-            accessorKey: "office",
+            accessorKey: "organizational_unit",
             header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Office" />
+                <DataTableColumnHeader column={column} title="Organization" />
             ),
             cell: ({ row }) => {
-
                 return (
                     <div className="capitalize break-words whitespace-normal">
-                        {row.original.office?.name}
-                    </div>
-                );
-            },
-            enableSorting: true,
-            enableHiding: true,
-        },
-        {
-            accessorKey: "division",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Division" />
-            ),
-            cell: ({ row }) => {
+                        {row.original?.organizational_unit?.hierarchy_path || ''}
 
-                return (
-                    <div className="capitalize break-words whitespace-normal">
-                        {row.original.division?.name}
                     </div>
                 );
             },
@@ -159,6 +145,36 @@ export const getColumns = () => {
             enableHiding: true,
         },
 
+        {
+            accessorKey: "active",
+            header: ({ column }) => (
+                <DataTableColumnHeader column={column} title="Status" />
+            ),
+            cell: ({ row }) => {
+                const isActive = row.original?.active;
+
+                return (
+                    <Badge className={isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}>
+
+                        {isActive ? (
+                            <>
+                                <CircleCheck className="w-4 h-4 inline mr-1" />
+                                Active
+                            </>
+                        ) : (
+                            <>
+                                <CircleXIcon className="w-4 h-4 inline mr-1" />
+                                Inactive
+                            </>
+                        )}
+
+                    </Badge>
+                );
+
+            },
+            enableSorting: true,
+            enableHiding: true,
+        },
         {
             accessorKey: "created_at",
             header: ({ column }) => (

@@ -3,7 +3,7 @@ import { DataTableColumnHeader } from "@/components/ui/data-table-column-header"
 import { RowActions } from "@/components/DataTable/RowActions";
 import { router } from "@inertiajs/react";
 import { toast } from "sonner";
-import { can } from "@/lib/can";
+import { can } from "@/lib/utils";
 
 export type Permission = {
     id: string | number | '';

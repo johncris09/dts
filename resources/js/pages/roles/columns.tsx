@@ -3,8 +3,8 @@ import { DataTableColumnHeader } from "@/components/ui/data-table-column-header"
 import { RowActions } from "@/components/DataTable/RowActions";
 import { router } from "@inertiajs/react";
 import { toast } from "sonner";
-import { can } from "@/lib/can";
 import { Badge } from "@/components/ui/badge";
+import { can } from "@/lib/utils";
 
 export type Role = {
     id: string | number | '';
