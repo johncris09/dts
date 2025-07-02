@@ -28,53 +28,59 @@ class UserController extends Controller
         Gate::authorize('view users');
 
 
-        $authUser = auth()->user();
+        $user = auth()->user();
 
 
         $search = $request->input('search');
         $perPage = $request->input('per_page', 10); // Default to 10 if not specified
+
         $roles = Role::all();
 
+        if ($user->hasRole('Super Admin')) {
 
-        // if ($authUser->hasRole('Super Admin')) {
+            $users = User::with(['roles', 'organizationalUnit'])
+                ->latest()
+                ->when($search, function ($query, $search) {
+                    $query->where(function ($query) use ($search) {
+                        $query->where('name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
+                    });
+                })
+                ->paginate($perPage);
 
-        //     $users = User::with('roles')
-        //         ->when($search, function ($query, $search) {
-        //             $query->where(function ($query) use ($search) {
-        //                 $query->where('name', 'like', "%{$search}%")
-        //                     ->orWhere('email', 'like', "%{$search}%");
-        //             });
-        //         })
-        //         ->paginate($perPage);
-        // } else if ($authUser->hasRole('Administrator')) {
-        //     $users = User::with('roles')
-        //         ->when($search, function ($query, $search) {
-        //             $query->where(function ($query) use ($search) {
-        //                 $query->where('name', 'like', "%{$search}%")
-        //                     ->orWhere('email', 'like', "%{$search}%");
-        //             });
-        //         })
-        //         ->paginate($perPage);
-        // }
-        $users = User::with(['roles', 'organizationalUnit'])
-            ->latest()
-            ->when($search, function ($query, $search) {
-                $query->where(function ($query) use ($search) {
-                    $query->where('name', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%");
-                });
-            })
-            ->paginate($perPage);
+            $users->getCollection()->transform(function ($user) {
+                if ($user->organizationalUnit) {
+                    $user->organizationalUnit->hierarchy_path = $user->organizationalUnit
+                        ->getHierarchyPath()
+                        ->pluck('name')
+                        ->implode(' > ');
+                }
+                return $user;
+            });
+        } elseif ($user->hasRole(['Administrator', 'Receiver'])) {
+            $unit = $user->organizationalUnit;
 
-        $users->getCollection()->transform(function ($user) {
-            if ($user->organizationalUnit) {
-                $user->organizationalUnit->hierarchy_path = $user->organizationalUnit
-                    ->getHierarchyPath()
-                    ->pluck('name')
-                    ->implode(' > ');
+            if (!$unit) {
+                $users = collect([]);
+            } else {
+                $unitIds = $this->getUnitAndDescendants($unit);
+
+                $users = User::with(['roles', 'organizationalUnit'])
+                    ->whereIn('organizational_unit_id', $unitIds)
+                    ->latest()
+                    ->when($search, function ($query, $search) {
+                        $query->where(function ($query) use ($search) {
+                            $query->where('name', 'like', "%{$search}%")
+                                ->orWhere('email', 'like', "%{$search}%");
+                        });
+                    })
+                    ->paginate($perPage);
             }
-            return $user;
-        });
+
+        } else {
+            // Other roles see nothing or handle as needed
+            $users = collect([]);
+        }
 
         return Inertia::render(
             'users/index',
@@ -89,6 +95,17 @@ class UserController extends Controller
         );
     }
 
+    private function getUnitAndDescendants($unit)
+    {
+        $ids = collect([$unit->id]);
+
+        foreach ($unit->children as $child) {
+            $ids = $ids->merge($this->getUnitAndDescendants($child));
+        }
+
+        return $ids;
+    }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -97,22 +114,45 @@ class UserController extends Controller
 
         Gate::authorize('create users');
 
-        $authUser = auth()->user();
-        $query = OrganizationalUnit::query();
-        $user = Auth::user();
+        $user = auth()->user();
 
-        $organizationalUnits = OrganizationalUnit::with('parent')->orderBy('name')->get();
-
-        $organizationalUnits->transform(function ($unit) {
-            $unit->hierarchy_path = $unit->getHierarchyPath()->pluck('name')->implode(' > ');
-            return $unit;
-        });
-
-        if ($authUser->hasRole('Super Admin')) {
+        if ($user->hasRole('Super Admin')) {
 
             $roles = Role::pluck('name');
-        } else if ($authUser->hasRole('Administrator')) {
+
+            $organizationalUnits = OrganizationalUnit::with('parent')->orderBy('name')->get();
+
+            $organizationalUnits->transform(function ($unit) {
+                $unit->hierarchy_path = $unit->getHierarchyPath()->pluck('name')->implode(' > ');
+                return $unit;
+            });
+        } elseif ($user->hasRole(['Administrator', 'Receiver'])) {
             $roles = Role::where('name', '!=', 'Super Admin')->pluck('name');
+
+            // Get their assigned unit
+            $unit = $user->organizationalUnit;
+
+            if (!$unit) {
+                // If they don't belong to a unit, return empty result
+                $organizationalUnits = collect([]);
+            } else {
+                // Get their unit + all child units
+                $unitIds = $this->getUnitAndDescendants($unit);
+
+
+                $organizationalUnits = OrganizationalUnit::with('parent')
+                    ->whereIn('id', $unitIds)
+                    ->orderBy('name')
+                    ->get();
+
+                $organizationalUnits->transform(function ($unit) {
+                    $unit->hierarchy_path = $unit->getHierarchyPath()->pluck('name')->implode(' > ');
+                    return $unit;
+                });
+            }
+        } else {
+            // Other roles see nothing or handle as needed
+            $organizationalUnits = collect([]);
         }
 
         return Inertia::render(
@@ -172,26 +212,57 @@ class UserController extends Controller
 
         Gate::authorize('edit users');
 
+        $userAuth = auth()->user();
 
-        $authUser = auth()->user();
-
-        $user->load('roles');
-        $organizationalUnits = OrganizationalUnit::with('parent')->orderBy('name')->get();
-
-        $organizationalUnits->transform(function ($unit) {
-            $unit->hierarchy_path = $unit->getHierarchyPath()->pluck('name')->implode(' > ');
-            return $unit;
-        });
-
-        if ($authUser->hasRole('Super Admin')) {
+        $user->load(['roles']);
+        if ($userAuth->hasRole('Super Admin')) {
             $roles = Role::pluck('name');
-        } else if ($authUser->hasRole('Administrator')) {
-            // Administrator can edit users under the same office (optional: same division)
-            // if ($authUser->office_id !== $user->office_id) {
-            //     abort(403, 'Unauthorized to edit this user.');
-            // }
+
+
+            $organizationalUnits = OrganizationalUnit::with('parent')->orderBy('name')->get();
+
+            $organizationalUnits->transform(function ($unit) {
+                $unit->hierarchy_path = $unit->getHierarchyPath()->pluck('name')->implode(' > ');
+                return $unit;
+            });
+        } elseif ($userAuth->hasRole(['Administrator', 'Receiver'])) {
             $roles = Role::where('name', '!=', 'Super Admin')->pluck('name');
+
+
+            // // Get their assigned unit
+            $unit = $userAuth->organizationalUnit;
+
+            if (!$unit) {
+                // If they don't belong to a unit, return empty result
+                $organizationalUnits = collect([]);
+            } else {
+                // Get their unit + all child units
+                $unitIds = $this->getUnitAndDescendants($unit);
+
+                if (!in_array($user->organizational_unit_id, $unitIds->toArray())) {
+                    abort(403, 'Unauthorized access.');
+                }
+
+                $organizationalUnits = OrganizationalUnit::with('parent')
+                    ->whereIn('id', $unitIds)
+                    ->orderBy('name')
+                    ->get();
+
+                $organizationalUnits->transform(function ($unit) {
+                    $unit->hierarchy_path = $unit->getHierarchyPath()->pluck('name')->implode(' > ');
+                    return $unit;
+                });
+            }
+
+        } else {
+
+            $organizationalUnits = collect([]);
         }
+
+
+
+
+
         return Inertia::render(
             'users/edit',
             [

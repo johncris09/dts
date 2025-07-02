@@ -21,13 +21,45 @@ class OrganizationalUnitController extends Controller
 
         $search = $request->input('search');
         $perPage = $request->input('per_page', 10); // Default to 10 if not specified
-        // $user = Auth::user('organizationalUnit');
-        $organizationalUnits = OrganizationalUnit::with('parent')->orderBy(column: 'name')->paginate($perPage);
 
-        $organizationalUnits->getCollection()->transform(function ($unit) {
-            $unit->hierarchy_path = $unit->getHierarchyPath()->pluck('name')->implode(' > ');
-            return $unit;
-        });
+
+
+        $user = auth()->user();
+
+        if ($user->hasRole('Super Admin')) {
+            $organizationalUnits = OrganizationalUnit::with('parent')->orderBy(column: 'name')->paginate($perPage);
+
+            $organizationalUnits->getCollection()->transform(function ($unit) {
+                $unit->hierarchy_path = $unit->getHierarchyPath()->pluck('name')->implode(' > ');
+                return $unit;
+            });
+        } elseif ($user->hasRole(['Administrator', 'Receiver'])) {
+
+            // Get their assigned unit
+            $unit = $user->organizationalUnit;
+
+            if (!$unit) {
+                // If they don't belong to a unit, return empty result
+                $organizationalUnits = collect([]);
+            } else {
+                // Get their unit + all child units
+                $unitIds = $this->getUnitAndDescendants($unit);
+
+
+                $organizationalUnits = OrganizationalUnit::with('parent')
+                    ->whereIn('id', $unitIds)
+                    ->orderBy(column: 'name')
+                    ->paginate($perPage);
+
+                $organizationalUnits->getCollection()->transform(function ($unit) {
+                    $unit->hierarchy_path = $unit->getHierarchyPath()->pluck('name')->implode(' > ');
+                    return $unit;
+                });
+            }
+        } else {
+            // Other roles see nothing or handle as needed
+            $organizationalUnits = collect([]);
+        }
 
         return Inertia::render('organizational_units/index', [
             'organizationalUnits' => OrganizationalUnitResource::collection($organizationalUnits),
@@ -38,18 +70,58 @@ class OrganizationalUnitController extends Controller
         ]);
 
     }
+    private function getUnitAndDescendants($unit)
+    {
+        $ids = collect([$unit->id]);
+
+        foreach ($unit->children as $child) {
+            $ids = $ids->merge($this->getUnitAndDescendants($child));
+        }
+
+        return $ids;
+    }
 
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
-        $organizationalUnits = OrganizationalUnit::with('parent')->orderBy('name')->get();
+        $user = auth()->user();
 
-        $organizationalUnits->transform(function ($unit) {
-            $unit->hierarchy_path = $unit->getHierarchyPath()->pluck('name')->implode(' > ');
-            return $unit;
-        });
+        if ($user->hasRole('Super Admin')) {
+            $organizationalUnits = OrganizationalUnit::with('parent')->orderBy('name')->get();
+
+            $organizationalUnits->transform(function ($unit) {
+                $unit->hierarchy_path = $unit->getHierarchyPath()->pluck('name')->implode(' > ');
+                return $unit;
+            });
+        } elseif ($user->hasRole(['Administrator', 'Receiver'])) {
+
+            // Get their assigned unit
+            $unit = $user->organizationalUnit;
+
+            if (!$unit) {
+                // If they don't belong to a unit, return empty result
+                $organizationalUnits = collect([]);
+            } else {
+                // Get their unit + all child units
+                $unitIds = $this->getUnitAndDescendants($unit);
+
+                $organizationalUnits = OrganizationalUnit::with('parent')
+                    ->whereIn('id', $unitIds)
+                    ->orderBy('name')
+                    ->get();
+
+                $organizationalUnits->transform(function ($unit) {
+                    $unit->hierarchy_path = $unit->getHierarchyPath()->pluck('name')->implode(' > ');
+                    return $unit;
+                });
+            }
+        } else {
+            // Other roles see nothing or handle as needed
+            $organizationalUnits = collect([]);
+        }
+
         return Inertia::render(
             'organizational_units/create',
             [
@@ -82,12 +154,49 @@ class OrganizationalUnitController extends Controller
      */
     public function edit(OrganizationalUnit $organizationalUnit)
     {
-        $organizationalUnits = OrganizationalUnit::with('parent')->orderBy('name')->get();
 
-        $organizationalUnits->transform(function ($unit) {
-            $unit->hierarchy_path = $unit->getHierarchyPath()->pluck('name')->implode(' > ');
-            return $unit;
-        });
+
+        $user = auth()->user();
+
+        if ($user->hasRole('Super Admin')) {
+
+
+            $organizationalUnits = OrganizationalUnit::with('parent')->orderBy('name')->get();
+
+            $organizationalUnits->transform(function ($unit) {
+                $unit->hierarchy_path = $unit->getHierarchyPath()->pluck('name')->implode(' > ');
+                return $unit;
+            });
+        } elseif ($user->hasRole(['Administrator', 'Receiver'])) {
+
+            // Get their assigned unit
+            $unit = $user->organizationalUnit;
+
+            if (!$unit) {
+                // If they don't belong to a unit, return empty result
+                $organizationalUnits = collect([]);
+            } else {
+                // Get their unit + all child units
+                $unitIds = $this->getUnitAndDescendants($unit);
+
+                if (!in_array($organizationalUnit->id, $unitIds->toArray())) {
+                    abort(403, 'Unauthorized access.');
+                }
+                $organizationalUnits = OrganizationalUnit::with('parent')
+                    ->whereIn('id', $unitIds)
+                    ->orderBy('name')
+                    ->get();
+
+                $organizationalUnits->transform(function ($unit) {
+                    $unit->hierarchy_path = $unit->getHierarchyPath()->pluck('name')->implode(' > ');
+                    return $unit;
+                });
+            }
+        } else {
+            // Other roles see nothing or handle as needed
+            $organizationalUnits = collect([]);
+        }
+
         return Inertia::render(
             'organizational_units/edit',
             [

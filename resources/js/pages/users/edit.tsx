@@ -81,6 +81,18 @@ export default function Users({ user, roles, organizationalUnits }: PageProps) {
             setData("roles", data.roles.filter(name => name !== roleName))
         }
     }
+
+    useEffect(() => {
+        if (data.organizational_unit_id) {
+            setData('organizational_unit_id', data.organizational_unit_id);
+            setSelectedUnit(data.organizational_unit_id);
+
+            const level = getUnitLevel(data.organizational_unit_id);
+            setUnitLevel(level);
+
+        }
+
+    }, [])
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Edit User" />

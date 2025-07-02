@@ -6,8 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { getInitials } from "@/hooks/helpers";
 import { Link, router } from "@inertiajs/react";
 import { toast } from "sonner";
-import { can } from "@/lib/utils";
-import { CircleCheck, CircleIcon, CircleXIcon } from "lucide-react";
+import { can, getRoleColor } from "@/lib/utils";
+import { CircleCheck, CircleXIcon } from "lucide-react";
 
 export type User = {
     id: number;
@@ -114,19 +114,26 @@ export const getColumns = () => {
             ),
             cell: ({ row }) => {
                 const roles = row.original.roles;
+
                 return (
-                    <div className="flex flex-wrap  gap-1">
-                        {roles.map((role, index) => (
-                            <div key={index} >
-                                <Badge className="text-xs capitalize" variant="outline">
+                    <div className="flex flex-wrap gap-1">
+                        {Array.isArray(roles) && roles.length > 0 ? (
+                            roles.map((role, index) => (
+                                <Badge
+                                    key={index}
+                                    className={`text-xs capitalize ${getRoleColor(role)}`}
+                                >
                                     {role}
                                 </Badge>
-                            </div>
-                        ))}
+                            ))
+                        ) : (
+                            <span className="text-gray-500 italic text-sm">No role</span>
+                        )}
                     </div>
                 );
             },
         },
+
 
         {
             accessorKey: "organizational_unit",
