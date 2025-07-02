@@ -6,7 +6,7 @@ import { Loader2Icon } from "lucide-react";
 import InputError from "@/components/input-error";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { FormEventHandler, useEffect, useState } from "react";
+import { FormEventHandler } from "react";
 import {
     Select,
     SelectContent,
@@ -55,10 +55,10 @@ export default function EditOrganizationalUnits({ organizationalUnit, parentUnit
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Update Organizational Unit" />
+            <Head title="Edit Organizational Unit" />
             <div className="container mx-auto space-y-6 px-5 py-6">
                 <div className="flex items-center justify-between">
-                    <h6 className="text-2x font-bold">Update Organizational Unit</h6>
+                    <h6 className="text-2x font-bold">Edit Organizational Unit</h6>
                 </div>
 
                 <form onSubmit={handleSubmit}>
