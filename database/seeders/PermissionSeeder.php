@@ -13,7 +13,16 @@ class PermissionSeeder extends Seeder
     public function run(): void
     {
         $permissions = [
+            'view document histories',
             'view dashboard',
+            'view documents',
+            'create documents',
+            'edit documents',
+            'delete documents',
+            'view document types',
+            'create document types',
+            'edit document types',
+            'delete document types',
             'view users',
             'create users',
             'edit users',
