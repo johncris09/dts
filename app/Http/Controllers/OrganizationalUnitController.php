@@ -60,9 +60,35 @@ class OrganizationalUnitController extends Controller
             // Other roles see nothing or handle as needed
             $organizationalUnits = collect([]);
         }
+        
+        $organizationalUnitsForSelect = collect([]);
+        
+        if ($user->hasRole('Super Admin')) { // If the logged-in user has the 'Super Admin' role Load ALL organizational units (with their parent relationship) sorted by name
+            $organizationalUnitsForSelect = OrganizationalUnit::with('parent')
+                ->orderBy('name')
+                ->get();
+        } elseif ($user->hasRole(['Administrator', 'Receiver'])) { // If the user is an Administrator or Receiver Get the user's assigned organizational unit (based on a foreign key relationship)
+            $unit = $user->organizationalUnit;
+
+            if ($unit) {
+                $unitIds = $this->getUnitAndDescendants($unit); // Recursively collect this unit and all of its descendants (children, grandchildren, etc.)
+                $organizationalUnitsForSelect = OrganizationalUnit::with('parent')  // Fetch only the organizational units that the user is allowed to see (theirs and descendants)
+                    ->whereIn('id', $unitIds)
+                    ->orderBy('name')
+                    ->get();
+            }
+        }
+
+        // After fetching the list, transform each unit to include a `hierarchy_path`
+        // This makes the unit’s full path like “Office > Division > Sub-Division > etc.” displayable in dropdowns
+        $organizationalUnitsForSelect->transform(function ($unit) {
+            $unit->hierarchy_path = $unit->getHierarchyPath()->pluck('name')->implode(' > ');
+            return $unit;
+        });
 
         return Inertia::render('organizational_units/index', [
             'organizationalUnits' => OrganizationalUnitResource::collection($organizationalUnits),
+            'parentUnits' => OrganizationalUnitResource::collection($organizationalUnitsForSelect),
             'filters' => [
                 'search' => $search,
                 'per_page' => $perPage
