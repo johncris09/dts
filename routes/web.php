@@ -9,6 +9,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\MessengerUserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -23,6 +24,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('permissions', PermissionController::class)->middleware('can:view permissions');
      Route::resource('documents', DocumentController::class)->middleware('can:view documents');
     Route::resource('organizational_units', OrganizationalUnitController::class)->middleware('can:view organizational units');
+    Route::resource('messenger_users', MessengerUserController::class)->middleware('can:view messengers');
 });
 
 require __DIR__.'/settings.php';

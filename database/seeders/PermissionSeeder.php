@@ -39,6 +39,8 @@ class PermissionSeeder extends Seeder
             'create roles',
             'edit roles',
             'delete roles',
+            'view messengers',
+            'delete messengers',
         ];
 
         foreach ($permissions as $permission) {
