@@ -3,7 +3,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { ArrowLeft, ArrowRight, Box, Building, CircleCheckBig, FilesIcon, GroupIcon, KeyRound, LayoutGrid, Network, ShieldAlert, UserIcon } from 'lucide-react';
+import { ArrowLeft, ArrowLeftCircleIcon, ArrowRight, Box, Building, CircleCheckBig, FilePlus2, FilePlus2Icon, FilesIcon, FileType, FileType2, FolderCheck, GroupIcon, KeyRound, LayoutGrid, LucideFilePlus2, Network, ShieldAlert, UserIcon } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -14,27 +14,22 @@ const mainNavItems: NavItem[] = [
         permission: ['view dashboard']
     },
     {
-        title: 'Documents',
-        href: '/documents',
-        icon: FilesIcon,
+        title: 'Create Documents',
+        href: '/documents/create',
+        icon: FilePlus2,
         permission: ['view documents']
     },
-    // {
-    //     title: 'Offices',
-    //     href: '/offices',
-    //     icon: Building,
-    //     permission: ['view offices']
-    // },
-    // {
-    //     title: 'Divisions',
-    //     href: '/divisions',
-    //     icon: Network,
-    //     permission: ['view divisions']
-    // },
+
+    {
+        title: 'Incoming',
+        href: '/incoming',
+        icon: ArrowLeftCircleIcon,
+        permission: ['view incoming']
+    },
     {
         title: 'Received',
         href: '/received',
-        icon: Box,
+        icon: FolderCheck,
         permission: ['view received']
     },
     {
@@ -54,6 +49,12 @@ const mainNavItems: NavItem[] = [
         href: '/return',
         icon: ArrowLeft,
         permission: ['view return']
+    },
+    {
+        title: 'Document Types',
+        href: '/document_types',
+        icon: FileType,
+        permission: ['view document types']
     },
     {
         title: 'Users',
