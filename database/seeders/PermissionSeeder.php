@@ -40,8 +40,6 @@ class PermissionSeeder extends Seeder
             'edit roles',
             'delete roles',
             'view messengers',
-            'create messengers',
-            'edit messengers',
             'delete messengers',
         ];
 

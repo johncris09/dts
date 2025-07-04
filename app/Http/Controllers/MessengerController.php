@@ -17,7 +17,7 @@ class MessengerUserController extends Controller
     {
         Gate::authorize('view messengers');
 
-        $messengerUsers = User::role('messenger')
+        $messengerUsers = User::role('Messenger')
             ->with('organizationalUnit') // eager load unit
             ->get();
 
@@ -60,7 +60,7 @@ class MessengerUserController extends Controller
     {
         Gate::authorize('view messengers');
 
-        if (!$messenger_user->hasRole('messenger')) {
+        if (!$messenger_user->hasRole('Messenger')) {
             abort(404, 'User is not a messenger.');
         }
 
@@ -104,7 +104,7 @@ class MessengerUserController extends Controller
     {
         Gate::authorize('delete messengers');
 
-        if (!$messenger_user->hasRole('messenger')) {
+        if (!$messenger_user->hasRole('Messenger')) {
             abort(404, 'User is not a messenger.');
         }
 
